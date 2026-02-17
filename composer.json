@@ -1,0 +1,15 @@
+{
+    "name": "user/whobaogofoundation",
+    "autoload": {
+        "psr-4": {
+            "User\\Whobaogofoundation\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "woobsit",
+            "email": "woobsit@gmail.com"
+        }
+    ],
+    "require": {}
+}
