@@ -1,0 +1,75 @@
+services:
+
+  # ── PHP + Apache ─────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wof_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./storage/logs:/var/www/html/storage/logs
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+      - APP_DEBUG=${APP_DEBUG:-true}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wof_network
+
+  # ── MySQL ─────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: wof_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-wof_cms}
+      MYSQL_USER: ${DB_USER:-wof_user}
+      MYSQL_PASSWORD: ${DB_PASS:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootsecret}
+    volumes:
+      - wof_db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASS:-rootsecret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - wof_network
+
+  # ── phpMyAdmin ────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: wof_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USER:-wof_user}
+      PMA_PASSWORD: ${DB_PASS:-secret}
+      UPLOAD_LIMIT: 64M
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wof_network
+
+# ── Volumes ───────────────────────────────────────
+volumes:
+  wof_db_data:
+    driver: local
+
+# ── Networks ──────────────────────────────────────
+networks:
+  wof_network:
+    driver: bridge
