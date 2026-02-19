@@ -2,7 +2,7 @@
   <div class="footer-main">
     <div class="f-about">
       <a href="index.php" style="display:inline-block;margin-bottom:1rem;">
-        <img src="/assets/images/logo.png" alt="Whoba Ogo Foundation" style="height: 52px; width: auto;">
+        <img src="./assets/images/logo.png" alt="Whoba Ogo Foundation" style="height: 52px; width: auto;">
       </a>
       <p>We are a social impact organization committed to bringing about enhanced education and better health care for people in Nigeria.</p>
       <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.3rem;">

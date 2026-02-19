@@ -126,7 +126,7 @@
 
   <ul class="nav-menu">
     <li><a href="index.php" class="active">Home</a></li>
-    <li><a href="about.php">About Us</a></li>
+    <li><a href="about-us.php">About Us</a></li>
     
     <!-- Our Work with dropdown -->
     <li class="has-dropdown">
@@ -135,13 +135,13 @@
         <span class="dropdown-arrow">▼</span>
       </a>
       <div class="dropdown-menu">
-        <a href="our-work.php#skill-development">Skill Development</a>
-        <a href="our-work.php#education-support">Education Support</a>
-        <a href="our-work.php#health-support">Health Support</a>
+        <a href="my-gallery.php">Gallery</a>
+        <a href="our-blog.php">Our Latest News</a>
+        
       </div>
     </li>
     
-    <li><a href="ict-hub.php">ICT Hub</a></li>
+    <li><a href="icthub.php">ICT Hub</a></li>
     <li><a href="testimonials.php">Testimonials</a></li>
     <li><a href="contact.php">Contact Us</a></li>
     <li><a href="donate.php" class="nav-cta">Donate ♥</a></li>
@@ -164,9 +164,9 @@
       <span class="mobile-dropdown-arrow">▼</span>
     </a>
     <div class="mobile-dropdown-menu">
-      <a href="our-work.php#skill-development">Skill Development</a>
-      <a href="our-work.php#education-support">Education Support</a>
-      <a href="our-work.php#health-support">Health Support</a>
+      <a href="my-gallery.php">Gallery</a>
+      <a href="our-blog.php">Our Latest News</a>
+      
     </div>
   </div>
   

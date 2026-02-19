@@ -22,10 +22,10 @@ include ('./includes/header.php');
       We are an African based social impact organization committed to touching lives of rural community dwellers through medical and educational support.
     </p>
     <div class="hero-btns">
-      <a href="about.php" class="btn-fill">
+      <a href="about-us.php" class="btn-fill">
         Read More Details <span class="ico">→</span>
       </a>
-      <a href="our-work.php" class="btn-outline">Our Work</a>
+      
     </div>
     <div class="hero-trust">
       <div class="trust-avatars">
@@ -135,7 +135,7 @@ include ('./includes/header.php');
           There is a very loud outcry by this multitude of voiceless underprivileged Africans who are bewildered by the hopelessness of their situation. All they are asking for is a listening ear and helping hand.
         </p>
         <div style="margin-top: 1.5rem;">
-          <a href="about.php" class="btn-fill">Read More Details <span class="ico">→</span></a>
+          <a href="about-us.php" class="btn-fill">Read More Details <span class="ico">→</span></a>
         </div>
       </div>
     </div>
@@ -154,7 +154,7 @@ include ('./includes/header.php');
         <div class="pillar-ico red">🎯</div>
         <h3>Our Mission</h3>
         <p>Committed to enhancing the quality of life by supporting initiatives that bring tangible change to rural communities across Nigeria.</p>
-        <a href="about.php" class="pillar-arrow">Learn More →</a>
+        <a href="about-us.php" class="pillar-arrow">Learn More →</a>
       </div>
       <div class="pillar-card rev d2">
         <div class="pillar-ico teal">📋</div>
@@ -166,7 +166,7 @@ include ('./includes/header.php');
         <div class="pillar-ico sun">🤲</div>
         <h3>Help &amp; Support</h3>
         <p>Our work has gotten to another height through your generosity. Partner with us to stretch the helping hand even further.</p>
-        <a href="donate.php" class="pillar-arrow">Get Involved →</a>
+        <a href="contact.php" class="pillar-arrow">Get Involved →</a>
       </div>
     </div>
   </div>
@@ -180,7 +180,7 @@ include ('./includes/header.php');
         <div class="eyebrow">Our Work</div>
         <h2 class="hdg">Our Programs</h2>
       </div>
-      <a href="our-work.php" class="btn-outline">View All →</a>
+      
     </div>
     <div class="progs-grid">
       <div class="prog-card red-card rev">
@@ -288,7 +288,7 @@ include ('./includes/header.php');
     <div class="news-grid">
       <div class="nc feat rev">
         <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#0D9B7E,#044030);">📋</div>
+          <div class="nc-img-inner" style="background:linear-gradient(135deg,#0D9B7E,#044030);"><img src="./assets/images/mock-770x532.jpg" alt="mock" title="Mock examination"/></div>
           <div class="nc-date">10 DEC</div>
         </div>
         <div class="nc-body">
@@ -300,7 +300,7 @@ include ('./includes/header.php');
       </div>
       <div class="nc rev d1">
         <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#B8861B,#6A4700);">🏆</div>
+          <div class="nc-img-inner" style="background:linear-gradient(135deg,#B8861B,#6A4700);"><img src="./assets/images/capture.jpg" alt="mock" title="Mock examination"/></div>
           <div class="nc-date">19 SEP</div>
         </div>
         <div class="nc-body">
@@ -311,29 +311,29 @@ include ('./includes/header.php');
       </div>
       <div class="nc rev d2">
         <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#E03535,#7A1010);">🎓</div>
-          <div class="nc-date">24 SEP</div>
+          <div class="nc-img-inner" style="background:linear-gradient(135deg,#E03535,#7A1010);"><img src="./assets/images/image3.jpg" alt="Outstanding Participant" title="Outstanding Participant"/></div>
+          <div class="nc-date">01 APR</div>
         </div>
         <div class="nc-body">
-          <div class="nc-cat">Graduation</div>
-          <h4>WOF Graduation Ceremony of Cohort 1 and Orientation</h4>
+          <div class="nc-cat">ICT Hub</div>
+          <h4>Whoba Ogo Foundation (WOF) ICT Center — Empowering the Next Generation</h4>
           <a href="#" class="nc-link">Read More →</a>
         </div>
       </div>
       <div class="nc rev">
         <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#076E58,#021A13);">💻</div>
+          <div class="nc-img-inner" style="background:linear-gradient(135deg,#076E58,#021A13);"><img src="./assets/images/cohort-3-training.jpg" alt="cohort-3-training" title="cohort-3-training"/></div>
           <div class="nc-date">04 MAR</div>
         </div>
         <div class="nc-body">
           <div class="nc-cat">ICT Hub</div>
-          <h4>WOF ICT Cohort 3 Tuition-Free Training Kicks Off With Over 100 Students</h4>
+          <h4>WOF ICT Cohort 3 Tuition-Free Training Kicks Off with Over</h4>
           <a href="#" class="nc-link">Read More →</a>
         </div>
       </div>
       <div class="nc rev d1">
         <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#3B5998,#1A2D5A);">📋</div>
+          <div class="nc-img-inner" style="background:linear-gradient(135deg,#3B5998,#1A2D5A);"><img src="./assets/images/wof3.jpg" alt="cohort-3-screen" title="cohort-3-screen"/></div>
           <div class="nc-date">15 FEB</div>
         </div>
         <div class="nc-body">
@@ -344,12 +344,12 @@ include ('./includes/header.php');
       </div>
       <div class="nc rev d2">
         <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#7B3F00,#3D1F00);">🏅</div>
-          <div class="nc-date">01 APR</div>
+          <div class="nc-img-inner" style="background:linear-gradient(135deg,#7B3F00,#3D1F00);"><img src="./assets/images/wof-graduation.jpeg" alt="graduation" title="graduation"/></div>
+          <div class="nc-date">24 SEP</div>
         </div>
         <div class="nc-body">
           <div class="nc-cat">ICT Hub</div>
-          <h4>Whoba Ogo Foundation (WOF) ICT Center — Empowering the Next Generation</h4>
+          <h4>WOF Graduation Ceremony of Cohort 1 and Orientation of Cohort 2</h4>
           <a href="#" class="nc-link">Read More →</a>
         </div>
       </div>
