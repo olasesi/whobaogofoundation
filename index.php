@@ -188,7 +188,7 @@ include ('./includes/header.php');
           <div class="prog-ico">💻</div>
           <h3>Skill Development Program</h3>
           <p>Empowering youth with in-demand digital and vocational skills through our fully-equipped ICT Hub — completely tuition-free of charge.</p>
-          <a href="ict-hub.php" class="prog-link">Explore the Hub →</a>
+          <a href="icthub.php" class="prog-link">Explore the Hub →</a>
         </div>
       </div>
       <div class="prog-card teal-card rev d1">
@@ -196,7 +196,7 @@ include ('./includes/header.php');
           <div class="prog-ico">📚</div>
           <h3>Education Support Program</h3>
           <p>Supporting underprivileged SS3 students with mock examinations, study resources, and mentorship ahead of critical WAEC examinations.</p>
-          <a href="our-work.php" class="prog-link">Learn More →</a>
+          <a href="education-support.php" class="prog-link">Learn More →</a>
         </div>
       </div>
       <div class="prog-card sun-card rev d2">
@@ -204,7 +204,7 @@ include ('./includes/header.php');
           <div class="prog-ico">🏥</div>
           <h3>Health Support Program</h3>
           <p>Bringing affordable, quality healthcare directly to rural communities where over 35% of Nigerians lack access to basic health services.</p>
-          <a href="our-work.php" class="prog-link">Learn More →</a>
+          <a href="health-support.php" class="prog-link">Learn More →</a>
         </div>
       </div>
     </div>
@@ -283,7 +283,7 @@ include ('./includes/header.php');
         <div class="eyebrow">To Humanity</div>
         <h2 class="hdg">Our Recent News</h2>
       </div>
-      <a href="news.php" class="btn-outline">All News →</a>
+      <a href="our-blog.php" class="btn-outline">All News →</a>
     </div>
     <div class="news-grid">
       <div class="nc feat rev">

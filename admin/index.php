@@ -394,10 +394,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="left-panel">
     <div class="panel-top">
       <div class="panel-logo">
-        <div class="logo-orb">♥</div>
         <div class="logo-text">
-          <strong>Whoba Ogo Foundation</strong>
-          <small>...touching lives</small>
+          <a href="index.php" class="logo"> <img src="./../assets/images/logo.png" alt="Whoba Ogo Foundation" style="height: 48px; width: auto;"></a>
         </div>
       </div>
     </div>

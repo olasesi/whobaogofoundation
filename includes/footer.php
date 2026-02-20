@@ -28,9 +28,9 @@
       <h5>Quick Links</h5>
       <ul>
         <li><a href="index.php">Home</a></li>
-        <li><a href="about.php">About Us</a></li>
+        <li><a href="about-us.php">About Us</a></li>
         <li><a href="our-work.php">Our Work</a></li>
-        <li><a href="ict-hub.php">ICT Hub</a></li>
+        <li><a href="icthub.php">ICT Hub</a></li>
         <li><a href="testimonials.php">Testimonials</a></li>
         <li><a href="contact.php">Contact Us</a></li>
       </ul>
@@ -39,7 +39,7 @@
     <div class="f-col">
       <h5>Programs</h5>
       <ul>
-        <li><a href="our-work.php#skill-development">Skill Development</a></li>
+        <li><a href="icthub.php">Skill Development</a></li>
         <li><a href="our-work.php#education-support">Education Support</a></li>
         <li><a href="our-work.php#health-support">Health Support</a></li>
         <li><a href="ict-hub.php">ICT Training Hub</a></li>

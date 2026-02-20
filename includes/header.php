@@ -144,7 +144,7 @@
     <li><a href="icthub.php">ICT Hub</a></li>
     <li><a href="testimonials.php">Testimonials</a></li>
     <li><a href="contact.php">Contact Us</a></li>
-    <li><a href="donate.php" class="nav-cta">Donate ♥</a></li>
+    <li><a href="volunteer.php" class="nav-cta">Become a volunteer ♥</a></li>
   </ul>
 
   <button class="hamburger" id="hamburger" aria-label="Toggle menu">
@@ -173,7 +173,7 @@
   <a href="ict-hub.php">ICT Hub</a>
   <a href="testimonials.php">Testimonials</a>
   <a href="contact.php">Contact Us</a>
-  <a href="donate.php" class="mobile-cta">Donate ♥</a>
+  <a href="volunteer.php" class="mobile-cta">Become a volunteer ♥</a>
 </nav>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
