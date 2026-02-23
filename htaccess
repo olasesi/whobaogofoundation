@@ -1,0 +1,24 @@
+# Whoba Ogo Foundation - URL Rewriting Rules
+# This file handles clean URLs for blog posts and other dynamic content
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Prevent rewriting of actual files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Route blog posts: /news/{slug} → /blog-post.php?slug={slug}
+    RewriteRule ^news/([a-z0-9-]+)/?$ /blog-post.php?slug=$1 [QSA,L]
+
+    # Route single program pages: /programs/{slug} → /program-detail.php?slug={slug}
+    RewriteRule ^programs/([a-z0-9-]+)/?$ /program-detail.php?slug=$1 [QSA,L]
+
+    # Route single gallery pages: /gallery/([a-z0-9-]+)/?$ → /gallery-detail.php?slug=$1
+    RewriteRule ^gallery/([a-z0-9-]+)/?$ /gallery-detail.php?slug=$1 [QSA,L]
+
+    # Remove trailing slashes (optional)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ /$1 [R=301,L]
+</IfModule>

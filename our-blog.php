@@ -1,5 +1,6 @@
 <?php
 require_once './includes/db.php';
+require_once './includes/markdown-parser.php';  // Include the markdown parser
 include './includes/header.php';
 
 // Pagination
@@ -228,6 +229,57 @@ $archives = $pdo->query(
   }
   .post-read-more:hover {
     background: var(--red-dark);
+  }
+
+  /* ── MARKDOWN CONTENT STYLING ────────────────────── */
+  .post-excerpt,
+  .post-content p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--ink-mid);
+  }
+
+  .post-excerpt figure,
+  .post-content figure {
+    margin: 1.5rem 0;
+    max-width: 100%;
+  }
+
+  .post-excerpt img,
+  .post-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+  }
+
+  .post-excerpt code,
+  .post-content code {
+    background: var(--surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: var(--red);
+  }
+
+  .post-excerpt pre,
+  .post-content pre {
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--r-sm);
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .post-excerpt strong,
+  .post-content strong {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .post-excerpt em,
+  .post-content em {
+    font-style: italic;
   }
 
   /* ── SIDEBAR ───────────────────────────────────── */
@@ -513,7 +565,14 @@ $archives = $pdo->query(
                 </h2>
                 
                 <div class="post-excerpt">
-                  <?= htmlspecialchars(substr(strip_tags($post['excerpt'] ?: $post['content']), 0, 150)) ?>...
+                  <?php
+                    // Use excerpt if available, otherwise extract from content
+                    if ($post['excerpt']) {
+                        echo htmlspecialchars(substr($post['excerpt'], 0, 150));
+                    } else {
+                        echo htmlspecialchars(substr(strip_tags($post['content']), 0, 150));
+                    }
+                  ?>...
                 </div>
                 
                 <a href="/news/<?= htmlspecialchars($post['slug']) ?>" class="post-read-more">
