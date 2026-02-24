@@ -575,7 +575,7 @@ $archives = $pdo->query(
                   ?>...
                 </div>
                 
-                <a href="/news/<?= htmlspecialchars($post['slug']) ?>" class="post-read-more">
+                <a href="news/<?= htmlspecialchars($post['slug']) ?>" class="post-read-more">
                   View Detail
                 </a>
               </div>

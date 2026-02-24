@@ -148,7 +148,7 @@ $publishedDate = new DateTime($post['published_at']);
         gap: 0.75rem;
         background: rgba(224,53,53,0.9);
         padding: 0.8rem 1.5rem;
-        border-radius: 100px;
+        border-radius: 8px;
     }
 
     .breadcrumb a,
@@ -180,8 +180,8 @@ $publishedDate = new DateTime($post['published_at']);
 
     .post-category {
         display: inline-block;
-        background: var(--red-soft);
-        color: var(--red);
+        background: #FFE6E6;
+        color: #E03535;
         padding: 0.5rem 1rem;
         border-radius: 100px;
         font-size: 0.75rem;
@@ -195,7 +195,7 @@ $publishedDate = new DateTime($post['published_at']);
         font-family: 'Fraunces', serif;
         font-size: clamp(2rem, 4vw, 2.8rem);
         font-weight: 900;
-        color: var(--ink);
+        color: #1a1a1a;
         line-height: 1.2;
         margin-bottom: 1.5rem;
     }
@@ -206,8 +206,8 @@ $publishedDate = new DateTime($post['published_at']);
         align-items: center;
         gap: 2rem;
         padding-bottom: 1.5rem;
-        border-bottom: 1.5px solid var(--border);
-        color: var(--ink-light);
+        border-bottom: 1.5px solid #e0e0e0;
+        color: #666;
         font-size: 0.9rem;
     }
 
@@ -218,7 +218,7 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .post-meta-item strong {
-        color: var(--ink);
+        color: #1a1a1a;
         font-weight: 600;
     }
 
@@ -226,7 +226,7 @@ $publishedDate = new DateTime($post['published_at']);
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: var(--red);
+        background: #E03535;
         color: #fff;
         display: flex;
         align-items: center;
@@ -239,7 +239,7 @@ $publishedDate = new DateTime($post['published_at']);
     .post-featured-image {
         width: 100%;
         max-height: 500px;
-        border-radius: var(--r-lg);
+        border-radius: 8px;
         overflow: hidden;
         margin-bottom: 2.5rem;
         box-shadow: 0 8px 24px rgba(0,0,0,0.1);
@@ -255,7 +255,7 @@ $publishedDate = new DateTime($post['published_at']);
     .post-body {
         font-size: 1rem;
         line-height: 1.8;
-        color: var(--ink-mid);
+        color: #555;
     }
 
     .post-body h1,
@@ -266,7 +266,7 @@ $publishedDate = new DateTime($post['published_at']);
     .post-body h6 {
         font-family: 'Fraunces', serif;
         font-weight: 900;
-        color: var(--ink);
+        color: #1a1a1a;
         margin: 1.5rem 0 1rem;
         line-height: 1.3;
     }
@@ -280,7 +280,7 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .post-body strong {
-        color: var(--ink);
+        color: #1a1a1a;
         font-weight: 700;
     }
 
@@ -289,15 +289,15 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .post-body a {
-        color: var(--red);
+        color: #E03535;
         text-decoration: none;
         font-weight: 600;
-        border-bottom: 2px solid var(--red-soft);
+        border-bottom: 2px solid #FFE6E6;
         transition: border-color 0.2s;
     }
 
     .post-body a:hover {
-        border-bottom-color: var(--red);
+        border-bottom-color: #E03535;
     }
 
     .post-body figure {
@@ -308,7 +308,7 @@ $publishedDate = new DateTime($post['published_at']);
     .post-body img {
         max-width: 100%;
         height: auto;
-        border-radius: var(--r-md);
+        border-radius: 8px;
         display: block;
     }
 
@@ -322,21 +322,21 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .post-body code {
-        background: var(--surface);
+        background: #f5f5f5;
         padding: 0.3rem 0.6rem;
         border-radius: 4px;
         font-family: 'Courier New', monospace;
-        color: var(--red);
+        color: #E03535;
         font-size: 0.9rem;
     }
 
     .post-body pre {
-        background: var(--surface);
+        background: #f5f5f5;
         padding: 1.5rem;
-        border-radius: var(--r-md);
+        border-radius: 8px;
         overflow-x: auto;
         margin: 1.5rem 0;
-        border-left: 4px solid var(--red);
+        border-left: 4px solid #E03535;
     }
 
     .post-body pre code {
@@ -346,10 +346,10 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .post-body blockquote {
-        border-left: 4px solid var(--red);
+        border-left: 4px solid #E03535;
         padding-left: 1.5rem;
         margin: 1.5rem 0;
-        color: var(--ink-light);
+        color: #888;
         font-style: italic;
     }
 
@@ -357,7 +357,7 @@ $publishedDate = new DateTime($post['published_at']);
     .post-footer {
         margin-top: 3rem;
         padding-top: 2rem;
-        border-top: 1.5px solid var(--border);
+        border-top: 1.5px solid #e0e0e0;
     }
 
     .post-tags {
@@ -369,8 +369,8 @@ $publishedDate = new DateTime($post['published_at']);
 
     .post-tag {
         display: inline-block;
-        background: var(--surface);
-        color: var(--ink-mid);
+        background: #f5f5f5;
+        color: #666;
         padding: 0.5rem 1rem;
         border-radius: 100px;
         font-size: 0.8rem;
@@ -380,7 +380,7 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .post-tag:hover {
-        background: var(--red);
+        background: #E03535;
         color: #fff;
     }
 
@@ -388,14 +388,14 @@ $publishedDate = new DateTime($post['published_at']);
     .comments-section {
         margin-top: 3rem;
         padding-top: 2rem;
-        border-top: 1.5px solid var(--border);
+        border-top: 1.5px solid #e0e0e0;
     }
 
     .comments-title {
         font-family: 'Fraunces', serif;
         font-size: 1.5rem;
         font-weight: 900;
-        color: var(--ink);
+        color: #1a1a1a;
         margin-bottom: 2rem;
     }
 
@@ -405,9 +405,9 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .comment-item {
-        background: var(--surface);
+        background: #f9f9f9;
         padding: 1.5rem;
-        border-radius: var(--r-md);
+        border-radius: 8px;
         margin-bottom: 1rem;
     }
 
@@ -422,7 +422,7 @@ $publishedDate = new DateTime($post['published_at']);
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: var(--red);
+        background: #E03535;
         color: #fff;
         display: flex;
         align-items: center;
@@ -438,16 +438,16 @@ $publishedDate = new DateTime($post['published_at']);
 
     .comment-author {
         font-weight: 700;
-        color: var(--ink);
+        color: #1a1a1a;
     }
 
     .comment-date {
         font-size: 0.8rem;
-        color: var(--ink-light);
+        color: #888;
     }
 
     .comment-body {
-        color: var(--ink-mid);
+        color: #555;
         line-height: 1.6;
     }
 
@@ -455,14 +455,14 @@ $publishedDate = new DateTime($post['published_at']);
     .related-posts {
         margin-top: 3rem;
         padding-top: 2rem;
-        border-top: 1.5px solid var(--border);
+        border-top: 1.5px solid #e0e0e0;
     }
 
     .related-title {
         font-family: 'Fraunces', serif;
         font-size: 1.5rem;
         font-weight: 900;
-        color: var(--ink);
+        color: #1a1a1a;
         margin-bottom: 1.5rem;
     }
 
@@ -473,9 +473,9 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .related-card {
-        background: var(--white);
-        border: 1px solid var(--border);
-        border-radius: var(--r-md);
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
         overflow: hidden;
         transition: box-shadow 0.3s, transform 0.2s;
     }
@@ -489,7 +489,7 @@ $publishedDate = new DateTime($post['published_at']);
         width: 100%;
         height: 180px;
         overflow: hidden;
-        background: var(--surface);
+        background: #f5f5f5;
     }
 
     .related-image img {
@@ -511,7 +511,7 @@ $publishedDate = new DateTime($post['published_at']);
         font-family: 'Fraunces', serif;
         font-size: 0.95rem;
         font-weight: 900;
-        color: var(--ink);
+        color: #1a1a1a;
         margin-bottom: 0.6rem;
         line-height: 1.3;
     }
@@ -524,12 +524,12 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .related-card:hover h4 {
-        color: var(--red);
+        color: #E03535;
     }
 
     .related-date {
         font-size: 0.75rem;
-        color: var(--ink-light);
+        color: #888;
     }
 
     /* ── SIDEBAR ───────────────────────────────────– */
@@ -539,9 +539,9 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .sidebar-widget {
-        background: var(--white);
-        border: 1px solid var(--border);
-        border-radius: var(--r-md);
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
     }
@@ -550,10 +550,10 @@ $publishedDate = new DateTime($post['published_at']);
         font-family: 'Fraunces', serif;
         font-size: 1rem;
         font-weight: 900;
-        color: var(--ink);
+        color: #1a1a1a;
         margin-bottom: 1rem;
         padding-bottom: 0.8rem;
-        border-bottom: 2px solid var(--red);
+        border-bottom: 2px solid #E03535;
     }
 
     .recent-posts-list {
@@ -562,7 +562,7 @@ $publishedDate = new DateTime($post['published_at']);
 
     .recent-post-item {
         padding: 0.8rem 0;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid #e0e0e0;
     }
 
     .recent-post-item:last-child {
@@ -571,7 +571,7 @@ $publishedDate = new DateTime($post['published_at']);
 
     .recent-post-item a {
         display: block;
-        color: var(--ink);
+        color: #1a1a1a;
         font-weight: 600;
         font-size: 0.85rem;
         line-height: 1.4;
@@ -580,12 +580,12 @@ $publishedDate = new DateTime($post['published_at']);
     }
 
     .recent-post-item a:hover {
-        color: var(--red);
+        color: #E03535;
     }
 
     .recent-post-date {
         font-size: 0.7rem;
-        color: var(--ink-light);
+        color: #888;
         margin-top: 0.3rem;
     }
 
@@ -601,18 +601,19 @@ $publishedDate = new DateTime($post['published_at']);
         justify-content: center;
         width: 40px;
         height: 40px;
-        border: 1.5px solid var(--border);
-        border-radius: var(--r-sm);
-        background: var(--white);
-        color: var(--ink-mid);
+        border: 1.5px solid #e0e0e0;
+        border-radius: 4px;
+        background: #fff;
+        color: #666;
         font-size: 1.1rem;
         cursor: pointer;
         transition: background 0.2s, border-color 0.2s, color 0.2s;
+        text-decoration: none;
     }
 
     .share-btn:hover {
-        background: var(--red);
-        border-color: var(--red);
+        background: #E03535;
+        border-color: #E03535;
         color: #fff;
     }
 
@@ -734,13 +735,13 @@ $publishedDate = new DateTime($post['published_at']);
                     <h2 class="comments-title">Comments (<?= count($comments) ?>)</h2>
 
                     <?php if ($commentMessage): ?>
-                        <div style="background: #E6F7F2; border: 1.5px solid #0D9B7E; border-left: 4px solid #0D9B7E; padding: 1rem; border-radius: var(--r-sm); margin-bottom: 1.5rem; color: #0D9B7E;">
+                        <div style="background: #E6F7F2; border: 1.5px solid #0D9B7E; border-left: 4px solid #0D9B7E; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: #0D9B7E;">
                             ✓ <?= htmlspecialchars($commentMessage) ?>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($commentError): ?>
-                        <div style="background: #FFE6E6; border: 1.5px solid #E03535; border-left: 4px solid #E03535; padding: 1rem; border-radius: var(--r-sm); margin-bottom: 1.5rem; color: #E03535;">
+                        <div style="background: #FFE6E6; border: 1.5px solid #E03535; border-left: 4px solid #E03535; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: #E03535;">
                             ✕ <?= htmlspecialchars($commentError) ?>
                         </div>
                     <?php endif; ?>
@@ -771,28 +772,28 @@ $publishedDate = new DateTime($post['published_at']);
                             <?php endforeach; ?>
                         </ul>
                     <?php else: ?>
-                        <p style="color: var(--ink-light); padding: 1rem 0;">No comments yet. Be the first to comment!</p>
+                        <p style="color: #888; padding: 1rem 0;">No comments yet. Be the first to comment!</p>
                     <?php endif; ?>
 
                     <!-- Comment Form -->
-                    <form method="POST" style="margin-top: 2rem; padding-top: 2rem; border-top: 1.5px solid var(--border);">
-                        <h3 style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 900; color: var(--ink); margin-bottom: 1.5rem;">Leave a Comment</h3>
+                    <form method="POST" style="margin-top: 2rem; padding-top: 2rem; border-top: 1.5px solid #e0e0e0;">
+                        <h3 style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 900; color: #1a1a1a; margin-bottom: 1.5rem;">Leave a Comment</h3>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <input type="text" name="author_name" placeholder="Your Name" required
-                                   style="padding: 0.8rem; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: inherit; font-size: 0.95rem;">
+                                   style="padding: 0.8rem; border: 1.5px solid #e0e0e0; border-radius: 4px; font-family: inherit; font-size: 0.95rem;">
                             <input type="email" name="author_email" placeholder="Your Email" required
-                                   style="padding: 0.8rem; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: inherit; font-size: 0.95rem;">
+                                   style="padding: 0.8rem; border: 1.5px solid #e0e0e0; border-radius: 4px; font-family: inherit; font-size: 0.95rem;">
                         </div>
 
                         <textarea name="comment_content" placeholder="Your comment..." required rows="4"
-                                  style="width: 100%; padding: 0.8rem; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-family: inherit; margin-bottom: 1rem; font-size: 0.95rem; resize: vertical;"></textarea>
+                                  style="width: 100%; padding: 0.8rem; border: 1.5px solid #e0e0e0; border-radius: 4px; font-family: inherit; margin-bottom: 1rem; font-size: 0.95rem; resize: vertical;"></textarea>
 
-                        <button type="submit" style="background: var(--red); color: #fff; padding: 0.9rem 2rem; border: none; border-radius: var(--r-sm); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s;">
+                        <button type="submit" style="background: #E03535; color: #fff; padding: 0.9rem 2rem; border: none; border-radius: 4px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s;">
                             Post Comment
                         </button>
 
-                        <p style="font-size: 0.8rem; color: var(--ink-light); margin-top: 0.8rem;">
+                        <p style="font-size: 0.8rem; color: #888; margin-top: 0.8rem;">
                             💬 Your comment will appear after moderation by our team.
                         </p>
 
@@ -852,7 +853,7 @@ $publishedDate = new DateTime($post['published_at']);
                 <!-- About Widget -->
                 <div class="sidebar-widget">
                     <h3 class="widget-title">About</h3>
-                    <p style="font-size: 0.9rem; line-height: 1.6; color: var(--ink-mid); margin: 0;">
+                    <p style="font-size: 0.9rem; line-height: 1.6; color: #555; margin: 0;">
                         Whoba Ogo Foundation is an African social impact organization committed to touching lives 
                         of rural community dwellers through medical and educational support.
                     </p>
@@ -863,9 +864,9 @@ $publishedDate = new DateTime($post['published_at']);
                     <h3 class="widget-title">Share This Post</h3>
                     <div class="share-buttons" style="margin: 0;">
                         <a href="https://facebook.com/sharer/sharer.php?u=<?= urlencode($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>" 
-                           target="_blank" class="share-btn" title="Share on Facebook" style="flex: 1; width: auto;">Facebook</a>
+                           target="_blank" class="share-btn" title="Share on Facebook" style="flex: 1; width: auto; text-decoration: none;">Facebook</a>
                         <a href="https://twitter.com/intent/tweet?url=<?= urlencode($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>" 
-                           target="_blank" class="share-btn" title="Share on Twitter" style="flex: 1; width: auto;">Twitter</a>
+                           target="_blank" class="share-btn" title="Share on Twitter" style="flex: 1; width: auto; text-decoration: none;">Twitter</a>
                     </div>
                 </div>
 
