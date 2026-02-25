@@ -1,6 +1,7 @@
 <?php
+require_once __DIR__ .'/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/includes/featured-image-uploader.php';
 
 // Guard — must be logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -109,49 +110,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
     } else {
         try {
             if ($action === 'create') {
-                // Generate featured image (for now, placeholder)
+                // Upload featured image
                 $featured_image = null;
                 if (isset($_FILES['featured_image']) && $_FILES['featured_image']['size'] > 0) {
-                    // TODO: Implement file upload logic
-                    $featured_image = $_FILES['featured_image']['name'];
+                    $uploadResult = uploadFeaturedImage($_FILES['featured_image']);
+                    if ($uploadResult['success']) {
+                        $featured_image = $uploadResult['path'];
+                    } else {
+                        $error = 'Image upload failed: ' . $uploadResult['error'];
+                        $featured_image = null;
+                    }
                 }
 
-                $stmt = $pdo->prepare("
-                    INSERT INTO posts 
-                    (author_id, category_id, post_type, title, slug, excerpt, content, 
-                     featured_image, status, visibility, allow_comments, is_featured, 
-                     published_at, scheduled_at, meta_title, meta_description, meta_keywords)
-                    VALUES 
-                    (:author_id, :category_id, 'post', :title, :slug, :excerpt, :content,
-                     :featured_image, :status, :visibility, :allow_comments, :is_featured,
-                     :published_at, :scheduled_at, :meta_title, :meta_description, :meta_keywords)
-                ");
+                if (!$error) {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO posts 
+                        (author_id, category_id, post_type, title, slug, excerpt, content, 
+                         featured_image, status, visibility, allow_comments, is_featured, 
+                         published_at, scheduled_at, meta_title, meta_description, meta_keywords)
+                        VALUES 
+                        (:author_id, :category_id, 'post', :title, :slug, :excerpt, :content,
+                         :featured_image, :status, :visibility, :allow_comments, :is_featured,
+                         :published_at, :scheduled_at, :meta_title, :meta_description, :meta_keywords)
+                    ");
 
-                $stmt->execute([
-                    ':author_id' => $adminId,
-                    ':category_id' => $category_id ?: null,
-                    ':title' => $title,
-                    ':slug' => $slug,
-                    ':excerpt' => $excerpt,
-                    ':content' => $content,
-                    ':featured_image' => $featured_image,
-                    ':status' => $status,
-                    ':visibility' => $visibility,
-                    ':allow_comments' => $allow_comments,
-                    ':is_featured' => $is_featured,
-                    ':published_at' => $published_at,
-                    ':scheduled_at' => $scheduled_at,
-                    ':meta_title' => $meta_title,
-                    ':meta_description' => $meta_description,
-                    ':meta_keywords' => $meta_keywords,
-                ]);
+                    $stmt->execute([
+                        ':author_id' => $adminId,
+                        ':category_id' => $category_id ?: null,
+                        ':title' => $title,
+                        ':slug' => $slug,
+                        ':excerpt' => $excerpt,
+                        ':content' => $content,
+                        ':featured_image' => $featured_image,
+                        ':status' => $status,
+                        ':visibility' => $visibility,
+                        ':allow_comments' => $allow_comments,
+                        ':is_featured' => $is_featured,
+                        ':published_at' => $published_at,
+                        ':scheduled_at' => $scheduled_at,
+                        ':meta_title' => $meta_title,
+                        ':meta_description' => $meta_description,
+                        ':meta_keywords' => $meta_keywords,
+                    ]);
 
-                $message = 'Post created successfully!';
-                $action = 'list';
+                    $message = 'Post created successfully! Image saved to: featured-images/' . date('Y-m-d') . '/';
+                    $action = 'list';
+                }
 
             } elseif ($action === 'edit' && $id) {
                 // Check ownership (authors can only edit their own posts)
-                $checkStmt = $pdo->prepare("SELECT author_id FROM posts WHERE id = :id");
+                $checkStmt = $pdo->prepare("SELECT author_id, featured_image FROM posts WHERE id = :id");
                 $checkStmt->execute([':id' => $id]);
                 $post = $checkStmt->fetch();
 
@@ -160,76 +168,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                 } elseif ($post['author_id'] != $adminId && $adminRole !== 'super_admin' && $adminRole !== 'editor') {
                     $error = 'You do not have permission to edit this post.';
                 } else {
-                    $featured_image = null;
+                    // Handle featured image upload
+                    $featured_image = $post['featured_image']; // Keep existing by default
+                    
                     if (isset($_FILES['featured_image']) && $_FILES['featured_image']['size'] > 0) {
-                        // TODO: Implement file upload logic
-                        $featured_image = $_FILES['featured_image']['name'];
+                        $uploadResult = uploadFeaturedImage($_FILES['featured_image']);
+                        if ($uploadResult['success']) {
+                            // Delete old image if exists
+                            if ($post['featured_image']) {
+                                deleteFeaturedImage($post['featured_image']);
+                            }
+                            $featured_image = $uploadResult['path'];
+                        } else {
+                            $error = 'Image upload failed: ' . $uploadResult['error'];
+                        }
                     }
 
-                    // Handle published_at: use provided date if status is published, otherwise preserve current
-                    $finalPublishedAt = $published_at;
-                    if ($status === 'published' && !$published_at) {
-                        // If publishing and no date provided, use current time
-                        $finalPublishedAt = date('Y-m-d H:i:s');
-                    } elseif ($status !== 'published') {
-                        // If not publishing, clear the published_at
-                        $finalPublishedAt = null;
+                    if (!$error) {
+                        // Handle published_at: use provided date if status is published, otherwise preserve current
+                        $finalPublishedAt = $published_at;
+                        if ($status === 'published' && !$published_at) {
+                            // If publishing and no date provided, use current time
+                            $finalPublishedAt = date('Y-m-d H:i:s');
+                        } elseif ($status !== 'published') {
+                            // If not publishing, clear the published_at
+                            $finalPublishedAt = null;
+                        }
+
+                        $updateQuery = "
+                            UPDATE posts 
+                            SET category_id = :category_id,
+                                title = :title,
+                                slug = :slug,
+                                excerpt = :excerpt,
+                                content = :content,
+                                featured_image = :featured_image,
+                                status = :status,
+                                visibility = :visibility,
+                                allow_comments = :allow_comments,
+                                is_featured = :is_featured,
+                                published_at = :published_at,
+                                scheduled_at = :scheduled_at,
+                                meta_title = :meta_title,
+                                meta_description = :meta_description,
+                                meta_keywords = :meta_keywords
+                            WHERE id = :id
+                        ";
+
+                        $updateStmt = $pdo->prepare($updateQuery);
+                        $params = [
+                            ':id' => $id,
+                            ':category_id' => $category_id ?: null,
+                            ':title' => $title,
+                            ':slug' => $slug,
+                            ':excerpt' => $excerpt,
+                            ':content' => $content,
+                            ':featured_image' => $featured_image,
+                            ':status' => $status,
+                            ':visibility' => $visibility,
+                            ':allow_comments' => $allow_comments,
+                            ':is_featured' => $is_featured,
+                            ':published_at' => $finalPublishedAt,
+                            ':scheduled_at' => $scheduled_at,
+                            ':meta_title' => $meta_title,
+                            ':meta_description' => $meta_description,
+                            ':meta_keywords' => $meta_keywords,
+                        ];
+
+                        $updateStmt->execute($params);
+
+                        $message = 'Post updated successfully!';
+                        $action = 'list';
                     }
-
-                    $updateQuery = "
-                        UPDATE posts 
-                        SET category_id = :category_id,
-                            title = :title,
-                            slug = :slug,
-                            excerpt = :excerpt,
-                            content = :content,
-                            status = :status,
-                            visibility = :visibility,
-                            allow_comments = :allow_comments,
-                            is_featured = :is_featured,
-                            published_at = :published_at,
-                            scheduled_at = :scheduled_at,
-                            meta_title = :meta_title,
-                            meta_description = :meta_description,
-                            meta_keywords = :meta_keywords
-                        WHERE id = :id
-                    ";
-
-                    if ($featured_image) {
-                        $updateQuery = str_replace(
-                            "meta_keywords = :meta_keywords",
-                            "featured_image = :featured_image, meta_keywords = :meta_keywords",
-                            $updateQuery
-                        );
-                    }
-
-                    $updateStmt = $pdo->prepare($updateQuery);
-                    $params = [
-                        ':id' => $id,
-                        ':category_id' => $category_id ?: null,
-                        ':title' => $title,
-                        ':slug' => $slug,
-                        ':excerpt' => $excerpt,
-                        ':content' => $content,
-                        ':status' => $status,
-                        ':visibility' => $visibility,
-                        ':allow_comments' => $allow_comments,
-                        ':is_featured' => $is_featured,
-                        ':published_at' => $finalPublishedAt,
-                        ':scheduled_at' => $scheduled_at,
-                        ':meta_title' => $meta_title,
-                        ':meta_description' => $meta_description,
-                        ':meta_keywords' => $meta_keywords,
-                    ];
-
-                    if ($featured_image) {
-                        $params[':featured_image'] = $featured_image;
-                    }
-
-                    $updateStmt->execute($params);
-
-                    $message = 'Post updated successfully!';
-                    $action = 'list';
                 }
             }
         } catch (Exception $e) {
@@ -243,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
 if ($action === 'delete' && $id) {
     try {
         // Check ownership
-        $checkStmt = $pdo->prepare("SELECT author_id FROM posts WHERE id = :id");
+        $checkStmt = $pdo->prepare("SELECT author_id, featured_image FROM posts WHERE id = :id");
         $checkStmt->execute([':id' => $id]);
         $post = $checkStmt->fetch();
 
@@ -252,9 +262,14 @@ if ($action === 'delete' && $id) {
         } elseif ($post['author_id'] != $adminId && $adminRole !== 'super_admin' && $adminRole !== 'editor') {
             $error = 'You do not have permission to delete this post.';
         } else {
+            // Delete featured image if exists
+            if ($post['featured_image']) {
+                deleteFeaturedImage($post['featured_image']);
+            }
+
             $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
             $deleteStmt->execute([':id' => $id]);
-            $message = 'Post deleted successfully!';
+            $message = 'Post and image deleted successfully!';
             $action = 'list';
         }
     } catch (Exception $e) {
@@ -266,7 +281,7 @@ if ($action === 'delete' && $id) {
 
 $posts = [];
 if ($action === 'list') {
-    $query = "SELECT p.id, p.title, p.status, p.views, p.created_at, a.name AS author_name
+    $query = "SELECT p.id, p.title, p.status, p.views, p.created_at, p.featured_image, a.name AS author_name
               FROM posts p
               LEFT JOIN admins a ON a.id = p.author_id
               WHERE p.post_type = 'post'";
@@ -309,7 +324,6 @@ if ($action === 'edit' && $id) {
         $action = 'list';
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1011,7 +1025,6 @@ if ($action === 'edit' && $id) {
 
   </div><!-- /.content -->
 </div><!-- /.main -->
-
 <script>
   // Sidebar toggle
   const sidebar   = document.getElementById('sidebar');
@@ -1081,30 +1094,86 @@ if ($action === 'edit' && $id) {
     textarea.selectionEnd = start + before.length + selected.length;
   }
 
-  // Handle inline image upload
+ // Handle inline image upload
+ // Handle inline image upload
   function handleImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
+
+    // Show a loading indicator
+    const btn = event.target.parentElement.querySelector('.editor-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Uploading...';
+    btn.disabled = true;
 
     // Create FormData for file upload
     const formData = new FormData();
     formData.append('image', file);
 
-    // Show a simple dialog for dimensions
-    const width = prompt('Image width (in pixels):', '600');
-    const height = prompt('Image height (in pixels):', 'auto');
+    // ✅ CORRECT - Auto-detects https or http
+const protocol = window.location.protocol;  // 'https:' or 'http:'
+const hostname = window.location.hostname;  // 'localhost'
+const port = window.location.port ? ':' + window.location.port : '';
 
-    if (!width) return; // User cancelled
+const uploadEndpoint = protocol + '//' + hostname + port + '/whobaogofoundation/admin/upload-image.php';
 
-    // For demo: use a placeholder path
-    // In production, you'd upload to server and get back the URL
-    const imagePath = '/assets/images/uploads/' + file.name;
-    const altText = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-    
-    const dimensions = height && height !== 'auto' ? `|${width}x${height}` : `|${width}`;
-    const markdownImage = `![${altText}${dimensions}](${imagePath})`;
+    // Upload to server
+    fetch(uploadEndpoint, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      // Check if response status is ok
+      if (!response.ok) {
+        throw new Error(`Server error ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        // Ask for dimensions
+        const width = prompt('Image width (in pixels):', '600');
+        if (!width) {
+          // User cancelled - still show success but with default size
+          const url = data.url;
+          const altText = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+          const markdownImage = `![${altText}|600](${url})`;
+          insertImageMarkdown(markdownImage);
+          showNotification('✓ Image uploaded successfully!', 'success');
+          return;
+        }
 
-    // Insert into textarea
+        const height = prompt('Image height (in pixels):', 'auto');
+        
+        // Build markdown with dimensions
+        const url = data.url;
+        const altText = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        const dimensions = height && height !== 'auto' ? `|${width}x${height}` : `|${width}`;
+        const markdownImage = `![${altText}${dimensions}](${url})`;
+
+        // Insert into textarea
+        insertImageMarkdown(markdownImage);
+        showNotification('✓ Image uploaded and inserted!', 'success');
+
+      } else {
+        showNotification('✗ Upload failed: ' + data.error, 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Upload error:', error);
+      showNotification('✗ Upload error: ' + error.message, 'error');
+    })
+    .finally(() => {
+      // Reset button
+      btn.textContent = originalText;
+      btn.disabled = false;
+      // Clear file input
+      event.target.value = '';
+    });
+  }
+
+  // Helper function to insert image markdown into textarea
+  function insertImageMarkdown(markdownImage) {
     const textarea = document.getElementById('content');
     if (textarea) {
       const start = textarea.selectionStart;
@@ -1113,31 +1182,131 @@ if ($action === 'edit' && $id) {
       
       textarea.value = text;
       textarea.focus();
-      textarea.selectionStart = start + markdownImage.length;
+      textarea.selectionStart = start + markdownImage.length + 2;
+    }
+  }
+
+  // Helper function to show notifications
+  function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+      max-width: 400px;
+      word-wrap: break-word;
+      ${type === 'success' ? 'background: #E6F7F2; color: #0D9B7E; border: 1.5px solid #0D9B7E;' : 'background: #FFE6E6; color: #E03535; border: 1.5px solid #E03535;'}
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // Add CSS animation (if not already added)
+  if (!document.querySelector('style[data-notifications]')) {
+    const style = document.createElement('style');
+    style.setAttribute('data-notifications', 'true');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  // Helper function to insert image markdown into textarea
+  function insertImageMarkdown(markdownImage) {
+    const textarea = document.getElementById('content');
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value.substring(0, start) + '\n\n' + markdownImage + '\n\n' + textarea.value.substring(end);
+      
+      textarea.value = text;
+      textarea.focus();
+      textarea.selectionStart = start + markdownImage.length + 2;
+    }
+  }
+
+  // Helper function to show notifications
+  function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+      ${type === 'success' ? 'background: #E6F7F2; color: #0D9B7E; border: 1.5px solid #0D9B7E;' : 'background: #FFE6E6; color: #E03535; border: 1.5px solid #E03535;'}
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // Add CSS animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
 
-    // TODO: In production, actually upload the file to your server
-    // Example implementation:
-    /*
-    fetch('/admin/upload-image.php', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const markdownImage = `![${altText}|${width}x${height}](${data.url})`;
-        // Insert into textarea...
-      } else {
-        alert('Upload failed: ' + data.error);
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
       }
-    })
-    .catch(error => {
-      console.error('Upload error:', error);
-      alert('Upload error occurred');
-    });
-    */
-  }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
 
 </script>
 

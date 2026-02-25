@@ -1,7 +1,6 @@
 <?php
+require_once __DIR__ .'/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
-
-session_start();
 
 // Already logged in — go to dashboard
 if (isset($_SESSION['admin_id'])) {

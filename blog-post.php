@@ -1,4 +1,5 @@
 <?php
+require_once './includes/config.php';
 require_once './includes/db.php';
 require_once './includes/markdown-parser.php';
 include './includes/header.php';
@@ -7,7 +8,7 @@ include './includes/header.php';
 $slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 
 if (!$slug) {
-    header('Location: /news');
+    header('Location: /');
     exit;
 }
 
@@ -115,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_id'])) {
         }
     }
 }
-
 $publishedDate = new DateTime($post['published_at']);
 ?>
 
@@ -657,8 +657,6 @@ $publishedDate = new DateTime($post['published_at']);
     <div class="breadcrumb">
         <a href="/">HOME</a>
         <span>/</span>
-        <a href="/news">BLOG</a>
-        <span>/</span>
         <span><?= htmlspecialchars(strtoupper(substr($post['title'], 0, 30))) ?>...</span>
     </div>
 </section>
@@ -817,7 +815,7 @@ $publishedDate = new DateTime($post['published_at']);
                                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22250%22 height=%22180%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22250%22 height=%22180%22/%3E%3C/svg%3E'">
                             </div>
                             <div class="related-content">
-                                <a href="/news/<?= htmlspecialchars($related['slug']) ?>">
+                                <a href="/<?= htmlspecialchars($related['slug']) ?>">
                                     <h4><?= htmlspecialchars($related['title']) ?></h4>
                                 </a>
                                 <div class="related-date"><?= $relatedDate->format('M d, Y') ?></div>
@@ -841,7 +839,7 @@ $publishedDate = new DateTime($post['published_at']);
                             $recentDate = new DateTime($recent['published_at']);
                         ?>
                         <li class="recent-post-item">
-                            <a href="/news/<?= htmlspecialchars($recent['slug']) ?>">
+                            <a href="/<?= htmlspecialchars($recent['slug']) ?>">
                                 <?= htmlspecialchars($recent['title']) ?>
                             </a>
                             <div class="recent-post-date"><?= $recentDate->format('M d, Y') ?></div>

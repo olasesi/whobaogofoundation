@@ -10,8 +10,8 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
-    # Route blog posts: /news/{slug} → /blog-post.php?slug={slug}
-    RewriteRule ^news/([a-z0-9-]+)/?$ blog-post.php?slug=$1 [QSA,L]
+    # Route blog posts: /{slug} → /blog-post.php?slug={slug}
+    RewriteRule ^([a-z0-9-]+)/?$ blog-post.php?slug=$1 [QSA,L]
 
     # Route single program pages: /programs/{slug} → /program-detail.php?slug={slug}
     RewriteRule ^programs/([a-z0-9-]+)/?$ program-detail.php?slug=$1 [QSA,L]
