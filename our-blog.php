@@ -1,4 +1,5 @@
 <?php
+require_once './includes/config.php';
 require_once './includes/db.php';
 require_once './includes/markdown-parser.php';  // Include the markdown parser
 include './includes/header.php';

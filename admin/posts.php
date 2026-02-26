@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ .'/../includes/config.php';
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/featured-image-uploader.php';
 
@@ -153,12 +153,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                         ':meta_keywords' => $meta_keywords,
                     ]);
 
-                    $message = 'Post created successfully! Image saved to: featured-images/' . date('Y-m-d') . '/';
+                    $message = 'Post created successfully!';
                     $action = 'list';
                 }
 
             } elseif ($action === 'edit' && $id) {
-                // Check ownership (authors can only edit their own posts)
+                // Check ownership
                 $checkStmt = $pdo->prepare("SELECT author_id, featured_image FROM posts WHERE id = :id");
                 $checkStmt->execute([':id' => $id]);
                 $post = $checkStmt->fetch();
@@ -169,12 +169,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                     $error = 'You do not have permission to edit this post.';
                 } else {
                     // Handle featured image upload
-                    $featured_image = $post['featured_image']; // Keep existing by default
+                    $featured_image = $post['featured_image'];
                     
                     if (isset($_FILES['featured_image']) && $_FILES['featured_image']['size'] > 0) {
                         $uploadResult = uploadFeaturedImage($_FILES['featured_image']);
                         if ($uploadResult['success']) {
-                            // Delete old image if exists
                             if ($post['featured_image']) {
                                 deleteFeaturedImage($post['featured_image']);
                             }
@@ -185,13 +184,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                     }
 
                     if (!$error) {
-                        // Handle published_at: use provided date if status is published, otherwise preserve current
                         $finalPublishedAt = $published_at;
                         if ($status === 'published' && !$published_at) {
-                            // If publishing and no date provided, use current time
                             $finalPublishedAt = date('Y-m-d H:i:s');
                         } elseif ($status !== 'published') {
-                            // If not publishing, clear the published_at
                             $finalPublishedAt = null;
                         }
 
@@ -252,7 +248,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
 
 if ($action === 'delete' && $id) {
     try {
-        // Check ownership
         $checkStmt = $pdo->prepare("SELECT author_id, featured_image FROM posts WHERE id = :id");
         $checkStmt->execute([':id' => $id]);
         $post = $checkStmt->fetch();
@@ -262,14 +257,13 @@ if ($action === 'delete' && $id) {
         } elseif ($post['author_id'] != $adminId && $adminRole !== 'super_admin' && $adminRole !== 'editor') {
             $error = 'You do not have permission to delete this post.';
         } else {
-            // Delete featured image if exists
             if ($post['featured_image']) {
                 deleteFeaturedImage($post['featured_image']);
             }
 
             $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
             $deleteStmt->execute([':id' => $id]);
-            $message = 'Post and image deleted successfully!';
+            $message = 'Post deleted successfully!';
             $action = 'list';
         }
     } catch (Exception $e) {
@@ -286,7 +280,6 @@ if ($action === 'list') {
               LEFT JOIN admins a ON a.id = p.author_id
               WHERE p.post_type = 'post'";
     
-    // Authors can only see their own posts, editors/super_admins see all
     if ($adminRole === 'author') {
         $query .= " AND p.author_id = :author_id";
     }
@@ -313,7 +306,6 @@ if ($action === 'edit' && $id) {
     $editPost = $stmt->fetch();
 
     if ($editPost) {
-        // Check permissions
         if ($editPost['author_id'] != $adminId && $adminRole !== 'super_admin' && $adminRole !== 'editor') {
             $error = 'You do not have permission to edit this post.';
             $action = 'list';
@@ -372,8 +364,7 @@ if ($action === 'edit' && $id) {
     }
 
     .form-input,
-    .form-select,
-    .form-textarea {
+    .form-select {
       padding: 0.9rem 1.1rem;
       border: 1.5px solid var(--border);
       border-radius: var(--r-sm);
@@ -385,39 +376,16 @@ if ($action === 'edit' && $id) {
     }
 
     .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
+    .form-select:focus {
       outline: none;
       border-color: var(--red);
       box-shadow: 0 0 0 3px rgba(224,53,53,0.1);
-    }
-
-    .form-textarea {
-      resize: vertical;
-      min-height: 120px;
-      font-family: 'Courier New', monospace;
     }
 
     .form-hint {
       font-size: 0.8rem;
       color: var(--ink-light);
       margin-top: 0.4rem;
-    }
-
-    .form-group.with-label-icon {
-      position: relative;
-    }
-
-    .form-group.with-label-icon .form-input {
-      padding-left: 2.5rem;
-    }
-
-    .form-group.with-label-icon .form-icon {
-      position: absolute;
-      left: 0.8rem;
-      top: 2.3rem;
-      font-size: 1.1rem;
-      color: var(--ink-light);
     }
 
     /* Checkboxes & Toggles */
@@ -442,32 +410,70 @@ if ($action === 'edit' && $id) {
       color: var(--ink);
     }
 
-    /* Rich Text Editor */
-    .editor-toolbar {
-      display: flex;
-      gap: 0.5rem;
+    /* Image Upload Slots */
+    .image-slots {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .image-slot {
+      position: relative;
+      border: 2px dashed var(--border);
+      border-radius: var(--r-md);
       padding: 1rem;
-      background: var(--surface);
-      border-bottom: 1.5px solid var(--border);
-      border-radius: var(--r-sm) var(--r-sm) 0 0;
-      flex-wrap: wrap;
-    }
-
-    .editor-btn {
-      padding: 0.5rem 0.8rem;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      text-align: center;
       cursor: pointer;
-      color: var(--ink);
-      transition: background 0.2s;
+      transition: all 0.2s;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
     }
 
-    .editor-btn:hover {
-      background: var(--red-soft);
+    .image-slot:hover {
       border-color: var(--red);
+      background: var(--red-pale);
+    }
+
+    .image-slot input[type="file"] {
+      display: none;
+    }
+
+    .image-slot-label {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .image-slot-text {
+      font-size: 0.75rem;
+      color: var(--ink-light);
+      font-weight: 600;
+    }
+
+    .image-slot img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 4px;
+    }
+
+    .image-slot.filled {
+      border-color: var(--teal);
+      background: var(--teal-soft);
+      padding: 0.5rem;
+    }
+
+    /* TinyMCE Custom Styling */
+    .tox-tinymce {
+      border: 1.5px solid var(--border) !important;
+      border-radius: var(--r-sm) !important;
+    }
+
+    .tox .tox-toolbar {
+      background: var(--surface) !important;
+      border-bottom: 1px solid var(--border) !important;
     }
 
     /* Form Actions */
@@ -646,6 +652,16 @@ if ($action === 'edit' && $id) {
 
       .form-card {
         padding: 1.5rem;
+      }
+
+      .image-slots {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .image-slots {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
   </style>
@@ -840,13 +856,10 @@ if ($action === 'edit' && $id) {
 
           <div class="form-group">
             <label class="form-label">Slug *</label>
-            <div class="form-group with-label-icon">
-              <span class="form-icon">🔗</span>
-              <input type="text" name="slug" id="slug" class="form-input"
-                     value="<?= htmlspecialchars($editPost['slug'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                     placeholder="whoba-ogo-foundation-launches-health-program"
-                     required>
-            </div>
+            <input type="text" name="slug" id="slug" class="form-input"
+                   value="<?= htmlspecialchars($editPost['slug'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                   placeholder="whoba-ogo-foundation-launches-health-program"
+                   required>
             <span class="form-hint">URL-friendly version of the title</span>
           </div>
         </div>
@@ -877,7 +890,7 @@ if ($action === 'edit' && $id) {
           </div>
         </div>
 
-        <!-- Published Date (custom date for when post was published) -->
+        <!-- Published Date -->
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Published Date</label>
@@ -887,22 +900,10 @@ if ($action === 'edit' && $id) {
           </div>
 
           <div class="form-group">
-            <label class="form-label">Status *</label>
-            <select name="status" class="form-select" id="status" onchange="toggleScheduledDate()">
-              <option value="draft" <?= !$editPost || $editPost['status'] === 'draft' ? 'selected' : '' ?>>Draft</option>
-              <option value="published" <?= $editPost && $editPost['status'] === 'published' ? 'selected' : '' ?>>Published</option>
-              <option value="archived" <?= $editPost && $editPost['status'] === 'archived' ? 'selected' : '' ?>>Archived</option>
-              <option value="scheduled" <?= $editPost && $editPost['status'] === 'scheduled' ? 'selected' : '' ?>>Scheduled</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Scheduled Date (shown only if status = scheduled) -->
-        <div class="form-grid" id="scheduledDateGroup" style="display:<?= $editPost && $editPost['status'] === 'scheduled' ? 'grid' : 'none' ?>;">
-          <div class="form-group full">
-            <label class="form-label">Scheduled Publish Date & Time</label>
-            <input type="datetime-local" name="scheduled_at" class="form-input"
-                   value="<?= $editPost && $editPost['scheduled_at'] ? (new DateTime($editPost['scheduled_at']))->format('Y-m-d\TH:i') : '' ?>">
+            <label class="form-label">Scheduled Date *</label>
+            <input type="datetime-local" name="scheduled_at" class="form-input" id="scheduledDateInput"
+                   value="<?= $editPost && $editPost['scheduled_at'] ? (new DateTime($editPost['scheduled_at']))->format('Y-m-d\TH:i') : '' ?>"
+                   style="display: <?= $editPost && $editPost['status'] === 'scheduled' ? 'block' : 'none' ?>">
             <span class="form-hint">When to automatically publish this post</span>
           </div>
         </div>
@@ -910,55 +911,41 @@ if ($action === 'edit' && $id) {
         <!-- Excerpt -->
         <div class="form-group full">
           <label class="form-label">Excerpt / Summary</label>
-          <textarea name="excerpt" class="form-textarea" 
+          <textarea name="excerpt" class="form-textarea" style="padding: 0.9rem 1.1rem; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 0.95rem; font-family: inherit; resize: vertical; min-height: 80px;"
                     placeholder="A brief summary that appears on listing pages..."><?= htmlspecialchars($editPost['excerpt'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
           <span class="form-hint">Optional: 150-160 characters recommended for SEO</span>
         </div>
 
-        <!-- Content -->
+        <!-- Content Editor (TinyMCE) -->
         <div class="form-group full">
           <label class="form-label">Content *</label>
-          <div class="editor-toolbar">
-            <button type="button" class="editor-btn" onclick="insertMarkdown('**', '**', 'Bold text')">
-              <strong>B</strong>
-            </button>
-            <button type="button" class="editor-btn" onclick="insertMarkdown('*', '*', 'Italic text')">
-              <em>I</em>
-            </button>
-            <button type="button" class="editor-btn" onclick="insertMarkdown('# ', '\n', 'Heading')">
-              H1
-            </button>
-            <button type="button" class="editor-btn" onclick="insertMarkdown('- ', '\n', 'List item')">
-              ≡ List
-            </button>
-            <button type="button" class="editor-btn" onclick="insertMarkdown('[', '](url)', 'Link text')">
-              🔗 Link
-            </button>
-            <button type="button" class="editor-btn" onclick="insertMarkdown('`', '`', 'Code')">
-              &lt;&gt; Code
-            </button>
-            <button type="button" class="editor-btn" onclick="document.getElementById('imageInput').click()">
-              🖼 Image
-            </button>
-            <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+          <textarea name="content" id="editor"><?= htmlspecialchars($editPost['content'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+          <span class="form-hint">Paste formatted content directly - it will maintain formatting!</span>
+        </div>
+
+        <!-- Image Upload Slots (5) -->
+        <div class="form-group full">
+          <label class="form-label">Post Images (Up to 5)</label>
+          <div class="image-slots" id="imageSlots">
+            <?php for ($i = 1; $i <= 5; $i++): ?>
+            <label class="image-slot" id="slot<?= $i ?>">
+              <input type="file" name="post_image_<?= $i ?>" accept="image/*" onchange="previewImage(event, <?= $i ?>)">
+              <span class="image-slot-label">📷</span>
+              <span class="image-slot-text">Upload Image <?= $i ?></span>
+            </label>
+            <?php endfor; ?>
           </div>
-          <textarea name="content" id="content" class="form-textarea" 
-                    placeholder="Write your post content here using Markdown format...&#10;&#10;Example inline image: ![Alt text|300x200](/path/to/image.jpg)"
-                    style="border-top: none; border-radius: 0 0 var(--r-sm) var(--r-sm); min-height: 400px;"
-                    required><?= htmlspecialchars($editPost['content'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-          <span class="form-hint">Supports Markdown. Use format: ![Alt text|width x height](image-url) for inline images with sizing. Example: ![Featured Event|600x400](/assets/images/event.jpg)</span>
+          <span class="form-hint">Click any slot to upload an image. Images will display in your post.</span>
         </div>
 
         <!-- Featured Image -->
-        <div class="form-grid">
-          <div class="form-group full">
-            <label class="form-label">Featured Image</label>
-            <input type="file" name="featured_image" class="form-input" accept="image/*">
-            <span class="form-hint">Recommended: 760×510px. Formats: JPG, PNG, WebP</span>
-            <?php if ($editPost && $editPost['featured_image']): ?>
-            <span class="form-hint" style="color: var(--teal);">Current: <?= htmlspecialchars($editPost['featured_image']) ?></span>
-            <?php endif; ?>
-          </div>
+        <div class="form-group full">
+          <label class="form-label">Featured Image</label>
+          <input type="file" name="featured_image" class="form-input" accept="image/*">
+          <span class="form-hint">Recommended: 760×510px. Formats: JPG, PNG, WebP</span>
+          <?php if ($editPost && $editPost['featured_image']): ?>
+          <span class="form-hint" style="color: var(--teal);">Current: <?= htmlspecialchars($editPost['featured_image']) ?></span>
+          <?php endif; ?>
         </div>
 
         <!-- SEO Section -->
@@ -984,7 +971,7 @@ if ($action === 'edit' && $id) {
           <div class="form-group full">
             <label class="form-label">Meta Description</label>
             <textarea name="meta_description" class="form-textarea" maxlength="320" 
-                      style="min-height: 80px;"
+                      style="padding: 0.9rem 1.1rem; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 0.95rem; font-family: inherit; min-height: 80px;"
                       placeholder="Brief description for search results (150-160 chars)..."><?= htmlspecialchars($editPost['meta_description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
           </div>
         </div>
@@ -1008,7 +995,7 @@ if ($action === 'edit' && $id) {
           <div class="form-check">
             <input type="checkbox" name="visibility" id="visibility" value="private"
                    <?= $editPost && $editPost['visibility'] === 'private' ? 'checked' : '' ?>>
-            <label for="visibility">Make this post private (only visible to logged-in users)</label>
+            <label for="visibility">Make this post private</label>
           </div>
         </div>
 
@@ -1025,25 +1012,43 @@ if ($action === 'edit' && $id) {
 
   </div><!-- /.content -->
 </div><!-- /.main -->
+
+<script src="https://cdn.tiny.cloud/1/c1nsuxnyu5y2evkgm4acxffzn659bingbrmzqk8kdb2e89gi/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
 <script>
+  tinymce.init({
+    selector: '#editor',
+    api_key: 'c1nsuxnyu5y2evkgm4acxffzn659bingbrmzqk8kdb2e89gi',
+    height: 400,
+    plugins: 'lists link image table wordcount',
+    toolbar: 'undo redo | formatselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | blockquote | removeformat | wordcount',
+    block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre',
+    statusbar: true,
+    paste_as_text: false
+  });
+
   // Sidebar toggle
-  const sidebar   = document.getElementById('sidebar');
+  const sidebar = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
+  if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  }
 
-  hamburger?.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (
-      window.innerWidth <= 900 &&
-      sidebar.classList.contains('open') &&
-      !sidebar.contains(e.target) &&
-      !hamburger.contains(e.target)
-    ) {
-      sidebar.classList.remove('open');
-    }
-  });
+  // Form submission
+  const form = document.querySelector('form.form-card');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      if (typeof tinymce !== 'undefined' && tinymce.get('editor')) {
+        const editorContent = tinymce.get('editor').getContent();
+        const contentField = document.querySelector('textarea[name="content"]');
+        if (contentField) {
+          contentField.value = editorContent;
+        }
+      }
+    });
+  }
 
   // Logout confirmation
   document.getElementById('logoutForm')?.addEventListener('submit', (e) => {
@@ -1072,242 +1077,26 @@ if ($action === 'edit' && $id) {
   // Toggle scheduled date field
   function toggleScheduledDate() {
     const statusSelect = document.getElementById('status');
-    const scheduledGroup = document.getElementById('scheduledDateGroup');
-    if (statusSelect && scheduledGroup) {
-      scheduledGroup.style.display = statusSelect.value === 'scheduled' ? 'grid' : 'none';
+    const scheduledInput = document.getElementById('scheduledDateInput');
+    if (statusSelect && scheduledInput) {
+      scheduledInput.style.display = statusSelect.value === 'scheduled' ? 'block' : 'none';
     }
   }
 
-  // Markdown editor helpers
-  function insertMarkdown(before, after, placeholder) {
-    const textarea = document.getElementById('content');
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selected = textarea.value.substring(start, end) || placeholder;
-    const text = textarea.value.substring(0, start) + before + selected + after + textarea.value.substring(end);
-
-    textarea.value = text;
-    textarea.focus();
-    textarea.selectionStart = start + before.length;
-    textarea.selectionEnd = start + before.length + selected.length;
-  }
-
- // Handle inline image upload
- // Handle inline image upload
-  function handleImageUpload(event) {
+  // Preview uploaded images in slots
+  function previewImage(event, slotNumber) {
     const file = event.target.files[0];
-    if (!file) return;
-
-    // Show a loading indicator
-    const btn = event.target.parentElement.querySelector('.editor-btn');
-    const originalText = btn.textContent;
-    btn.textContent = '⏳ Uploading...';
-    btn.disabled = true;
-
-    // Create FormData for file upload
-    const formData = new FormData();
-    formData.append('image', file);
-
-    // ✅ CORRECT - Auto-detects https or http
-const protocol = window.location.protocol;  // 'https:' or 'http:'
-const hostname = window.location.hostname;  // 'localhost'
-const port = window.location.port ? ':' + window.location.port : '';
-
-const uploadEndpoint = protocol + '//' + hostname + port + '/whobaogofoundation/admin/upload-image.php';
-
-    // Upload to server
-    fetch(uploadEndpoint, {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => {
-      // Check if response status is ok
-      if (!response.ok) {
-        throw new Error(`Server error ${response.status}: ${response.statusText}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        // Ask for dimensions
-        const width = prompt('Image width (in pixels):', '600');
-        if (!width) {
-          // User cancelled - still show success but with default size
-          const url = data.url;
-          const altText = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-          const markdownImage = `![${altText}|600](${url})`;
-          insertImageMarkdown(markdownImage);
-          showNotification('✓ Image uploaded successfully!', 'success');
-          return;
-        }
-
-        const height = prompt('Image height (in pixels):', 'auto');
-        
-        // Build markdown with dimensions
-        const url = data.url;
-        const altText = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-        const dimensions = height && height !== 'auto' ? `|${width}x${height}` : `|${width}`;
-        const markdownImage = `![${altText}${dimensions}](${url})`;
-
-        // Insert into textarea
-        insertImageMarkdown(markdownImage);
-        showNotification('✓ Image uploaded and inserted!', 'success');
-
-      } else {
-        showNotification('✗ Upload failed: ' + data.error, 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Upload error:', error);
-      showNotification('✗ Upload error: ' + error.message, 'error');
-    })
-    .finally(() => {
-      // Reset button
-      btn.textContent = originalText;
-      btn.disabled = false;
-      // Clear file input
-      event.target.value = '';
-    });
-  }
-
-  // Helper function to insert image markdown into textarea
-  function insertImageMarkdown(markdownImage) {
-    const textarea = document.getElementById('content');
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const text = textarea.value.substring(0, start) + '\n\n' + markdownImage + '\n\n' + textarea.value.substring(end);
-      
-      textarea.value = text;
-      textarea.focus();
-      textarea.selectionStart = start + markdownImage.length + 2;
+    const slot = document.getElementById('slot' + slotNumber);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        slot.innerHTML = `<img src="${e.target.result}" alt="Image ${slotNumber}">`;
+        slot.classList.add('filled');
+      };
+      reader.readAsDataURL(file);
     }
   }
-
-  // Helper function to show notifications
-  function showNotification(message, type) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 700;
-      z-index: 9999;
-      animation: slideIn 0.3s ease;
-      max-width: 400px;
-      word-wrap: break-word;
-      ${type === 'success' ? 'background: #E6F7F2; color: #0D9B7E; border: 1.5px solid #0D9B7E;' : 'background: #FFE6E6; color: #E03535; border: 1.5px solid #E03535;'}
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-      notification.style.animation = 'slideOut 0.3s ease';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
-  }
-
-  // Add CSS animation (if not already added)
-  if (!document.querySelector('style[data-notifications]')) {
-    const style = document.createElement('style');
-    style.setAttribute('data-notifications', 'true');
-    style.textContent = `
-      @keyframes slideIn {
-        from {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideOut {
-        from {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  // Helper function to insert image markdown into textarea
-  function insertImageMarkdown(markdownImage) {
-    const textarea = document.getElementById('content');
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const text = textarea.value.substring(0, start) + '\n\n' + markdownImage + '\n\n' + textarea.value.substring(end);
-      
-      textarea.value = text;
-      textarea.focus();
-      textarea.selectionStart = start + markdownImage.length + 2;
-    }
-  }
-
-  // Helper function to show notifications
-  function showNotification(message, type) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 700;
-      z-index: 9999;
-      animation: slideIn 0.3s ease;
-      ${type === 'success' ? 'background: #E6F7F2; color: #0D9B7E; border: 1.5px solid #0D9B7E;' : 'background: #FFE6E6; color: #E03535; border: 1.5px solid #E03535;'}
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-      notification.style.animation = 'slideOut 0.3s ease';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
-  }
-
-  // Add CSS animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes slideOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-
 </script>
 
 </body>

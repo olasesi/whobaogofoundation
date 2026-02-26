@@ -1,8 +1,6 @@
 <?php
 require_once './includes/config.php';
 require_once './includes/db.php';
-require_once './includes/markdown-parser.php';
-include './includes/header.php';
 
 // Get the slug from the URL
 $slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
@@ -28,7 +26,7 @@ $post = $stmt->fetch();
 // If post not found, redirect to blog
 if (!$post) {
     header('HTTP/1.0 404 Not Found');
-    include '404.php';
+    include 'error.php';
     exit;
 }
 
@@ -116,8 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_id'])) {
         }
     }
 }
+
 $publishedDate = new DateTime($post['published_at']);
+include './includes/header.php';
+
 ?>
+
+
 
 <style>
     /* ── PAGE HERO ─────────────────────────────────── */
@@ -251,6 +254,34 @@ $publishedDate = new DateTime($post['published_at']);
         object-fit: cover;
     }
 
+    /* ── POST IMAGES (5 slots) ─────────────────────── */
+    .post-images {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .post-image-item {
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f5f5f5;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .post-image-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .post-image-item img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        display: block;
+    }
+
     /* ── POST CONTENT ──────────────────────────────── */
     .post-body {
         font-size: 1rem;
@@ -310,6 +341,7 @@ $publishedDate = new DateTime($post['published_at']);
         height: auto;
         border-radius: 8px;
         display: block;
+        margin: 1.5rem 0;
     }
 
     .post-body ul,
@@ -644,6 +676,10 @@ $publishedDate = new DateTime($post['published_at']);
         .post-body {
             font-size: 0.95rem;
         }
+
+        .post-images {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -704,14 +740,9 @@ $publishedDate = new DateTime($post['published_at']);
                     </div>
                 <?php endif; ?>
 
-                <!-- Post Body -->
+                <!-- Post Body (HTML content) -->
                 <div class="post-body">
-                    <?php 
-                        // Parse markdown and render images with sizing
-                        $html = parseMarkdown($post['content']);
-                        $safe = sanitizeHtml($html);
-                        echo $safe;
-                    ?>
+                    <?= $post['content']; ?>
                 </div>
 
                 <!-- Post Footer -->

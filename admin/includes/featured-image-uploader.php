@@ -21,7 +21,7 @@
 class FeaturedImageUploader {
     
     // Configuration
-    private const BASE_DIR = __DIR__ . '/../assets/images/featured-images';
+    private const BASE_DIR = __DIR__ . '/../../assets/images/featured-images';
     private const MAX_SIZE = 5242880; // 5MB
     private const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     private const ALLOWED_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
