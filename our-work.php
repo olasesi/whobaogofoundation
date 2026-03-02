@@ -266,7 +266,7 @@ include './includes/header.php';
   <div class="wrap">
     <div class="work-grid">
       <div class="work-img">
-        <img src="/assets/images/education-program.jpg" alt="Access to Quality Education"
+        <img src="<?= $_ENV['BASE_URL'] ?>assets/images/girls-education.jpg" alt="Access to Quality Education"
              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22450%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22600%22 height=%22450%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2260%22 fill=%22%230D9B7E%22%3E📚%3C/text%3E%3C/svg%3E'">
       </div>
       <div class="work-content">
@@ -275,7 +275,7 @@ include './includes/header.php';
         <p>
           We believe that discovery is the bedrock of recovery and our goal is to discover students and nurture them to growth by supporting them with necessary tools that will focus them in the right direction. We provide access to education and create learning opportunities through Scholarships and Learning resources.
         </p>
-        <a href="#" class="read-more-btn">Read More</a>
+        <a href="<?= $_ENV['BASE_URL'] ?>education-support.php" class="read-more-btn">Read More</a>
       </div>
     </div>
   </div>
@@ -294,10 +294,10 @@ include './includes/header.php';
         <p>
           We also have a very soft spot for the issue of the Sickle Cell Disease. This is especially because Nigeria currently holds the highest count on the number of children born annually with the Sickle Cell Disease globally.
         </p>
-        <a href="#" class="read-more-btn">Read More</a>
+        <a href="<?= $_ENV['BASE_URL'] ?>health-support.php" class="read-more-btn">Read More</a>
       </div>
       <div class="work-img">
-        <img src="/assets/images/health-program.jpg" alt="Quality Health Support"
+        <img src="<?= $_ENV['BASE_URL'] ?>assets/images/use-this.jpg" alt="Health Outreach" alt="Quality Health Support"
              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22450%22%3E%3Crect fill=%22%23FDE8E8%22 width=%22600%22 height=%22450%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2260%22 fill=%22%23E03535%22%3E🏥%3C/text%3E%3C/svg%3E'">
       </div>
     </div>
@@ -309,7 +309,7 @@ include './includes/header.php';
   <div class="wrap">
     <div class="work-grid">
       <div class="work-img">
-        <img src="/assets/images/skill-program.jpg" alt="Access to Skill Development"
+        <img src="<?= $_ENV['BASE_URL'] ?>assets/images/cohort-3-training.jpg" alt="Access to Skill Development"
              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22450%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22600%22 height=%22450%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2260%22 fill=%22%23F5A623%22%3E💻%3C/text%3E%3C/svg%3E'">
       </div>
       <div class="work-content">
@@ -318,7 +318,7 @@ include './includes/header.php';
         <p>
           According to the world bank, one third of the working age population in low and middle income countries lack the basic skills required to get quality jobs, leaving them unable to achieve their full productive potential and limiting economic growth and investment, low skills perpetuate poverty and inequality.
         </p>
-        <a href="/ict-hub" class="read-more-btn">Read More</a>
+        <a href="<?= $_ENV['BASE_URL'] ?>icthub.php" class="read-more-btn">Read More</a>
       </div>
     </div>
   </div>
@@ -327,14 +327,14 @@ include './includes/header.php';
 <!-- ── CHARITY EVENTS ──────────────────────────── -->
 <section class="charity-events">
   <div class="wrap">
-    <a href="/contact" class="volunteer-btn">Become a Volunteer</a>
+    <a href="<?= $_ENV['BASE_URL'] ?>/volunteer.php" class="volunteer-btn">Become a Volunteer</a>
     
     <div class="events-label">GIVING BACK TO HUMANITY</div>
     <h2 class="events-title">Our Charity Events</h2>
     
     <div class="events-grid">
       <div class="event-card">
-        <img src="/assets/images/event-health.jpg" alt="Health Outreach"
+        <img src="<?= $_ENV['BASE_URL'] ?>assets/images/use-this.jpg" alt="Health Outreach"
              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22450%22%3E%3Crect fill=%22%230D9B7E%22 width=%22600%22 height=%22450%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2260%22 fill=%22white%22%3E🏥%3C/text%3E%3C/svg%3E'">
         <div class="event-overlay">
           <span class="event-category">READ MORE</span>
@@ -345,7 +345,7 @@ include './includes/header.php';
       </div>
 
       <div class="event-card">
-        <img src="/assets/images/event-symposium.jpg" alt="Amsul Symposium"
+        <img src="<?= $_ENV['BASE_URL'] ?>assets/images/IMG_8760.jpg" alt="Amsul Symposium"
              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22450%22%3E%3Crect fill=%22%23131511%22 width=%22600%22 height=%22450%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2260%22 fill=%22white%22%3E🎤%3C/text%3E%3C/svg%3E'">
         <div class="event-overlay">
           <span class="event-category">READ MORE</span>

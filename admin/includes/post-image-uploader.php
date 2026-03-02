@@ -1,46 +1,34 @@
 <?php
 /**
- * Featured Image Upload Handler
+ * Post Images Upload Handler
  * 
- * Handles image uploads with:
- * - Date-based folder organization
- * - Unique filename generation
- * - File validation
- * - Error handling
- * - Single image per post (replaces old one)
+ * Handles uploads for 5 post images (0-5 images per post)
+ * Stores image paths in database as JSON array
  * 
- * Images stored at: /assets/images/featured-images/YYYY-MM-DD/filename.jpg
+ * Images stored at: /assets/images/post-images/YYYY-MM-DD/filename.jpg
  * (In root assets folder, NOT in admin assets)
  * 
  * Path explanation:
- * File location: /admin/includes/featured-image-uploader.php
+ * File location: /admin/includes/post-image-uploader.php
  * __DIR__ = /admin/includes
  * __DIR__ . '/../..' = /admin/includes/.. (admin) /.. (root)
- * __DIR__ . '/../../assets/images/featured-images' = /assets/images/featured-images
- * 
- * Usage:
- *   $result = uploadFeaturedImage($_FILES['featured_image']);
- *   if ($result['success']) {
- *       $imagePath = $result['path'];
- *   } else {
- *       $error = $result['error'];
- *   }
+ * __DIR__ . '/../../assets/images/post-images' = /assets/images/post-images
  */
 
-class FeaturedImageUploader {
+class PostImageUploader {
     
     // Configuration - Goes OUT of admin to root assets
     // __DIR__/../../ = go out of includes, then out of admin to root
-    private const BASE_DIR = __DIR__ . '/../../assets/images/featured-images';
+    private const BASE_DIR = __DIR__ . '/../../assets/images/post-images';
     private const MAX_SIZE = 5242880; // 5MB
     private const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     private const ALLOWED_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
     
     /**
-     * Upload featured image (single image per post)
+     * Upload single post image
      * 
      * @param array $file $_FILES array element
-     * @return array ['success' => bool, 'path' => string, 'filename' => string, 'error' => string]
+     * @return array ['success' => bool, 'path' => string, 'url' => string, 'error' => string]
      */
     public static function upload(array $file): array {
         // Check if file was uploaded
@@ -69,11 +57,8 @@ class FeaturedImageUploader {
         }
 
         // Generate unique filename
-        $originalName = basename($file['name']);
-        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $filename = self::generateUniqueName($ext);
-
-        // Full path to save
         $uploadPath = $uploadDir . '/' . $filename;
 
         // Move uploaded file
@@ -84,15 +69,15 @@ class FeaturedImageUploader {
         // Set proper permissions
         chmod($uploadPath, 0644);
 
-        // Return relative path for database storage
-        $relativePath = 'featured-images/' . $dateFolder . '/' . $filename;
+        // Return relative and absolute paths
+        $relativePath = 'post-images/' . $dateFolder . '/' . $filename;
+        $publicUrl = '/assets/images/' . $relativePath;
 
         return [
             'success' => true,
             'path' => $relativePath,
-            'filename' => $filename,
-            'dateFolder' => $dateFolder,
-            'fullPath' => $uploadPath
+            'url' => $publicUrl,
+            'filename' => $filename
         ];
     }
 
@@ -145,9 +130,7 @@ class FeaturedImageUploader {
     }
 
     /**
-     * Generate unique filename to prevent collisions
-     * Format: {timestamp}-{random}.{ext}
-     * Example: 1708873200-a7f3k.jpg
+     * Generate unique filename
      */
     private static function generateUniqueName(string $ext): string {
         $timestamp = time();
@@ -156,70 +139,68 @@ class FeaturedImageUploader {
     }
 
     /**
-     * Delete a featured image
+     * Delete image by path
      * 
-     * @param string $relativePath Path stored in database (e.g., 'featured-images/2024-02-25/1708873200-a7f3k.jpg')
-     * @return array ['success' => bool, 'error' => string]
+     * @param string $relativePath Path stored in database
+     * @return bool Success
      */
-    public static function delete(string $relativePath): array {
+    public static function deleteImage(string $relativePath): bool {
         if (empty($relativePath)) {
-            return ['success' => true]; // No image to delete
+            return true;
         }
 
-        // Prevent directory traversal attacks
         if (strpos($relativePath, '..') !== false || strpos($relativePath, './') === 0) {
-            return ['success' => false, 'error' => 'Invalid path'];
+            return false;
         }
 
-        // Build full path - need to go to root assets
+        // Go to root assets
         $fullPath = __DIR__ . '/../../assets/images/' . $relativePath;
-
-        // Verify file exists and is in correct directory
         $realPath = realpath($fullPath);
         $baseRealPath = realpath(self::BASE_DIR);
 
         if (!$realPath || !$baseRealPath || strpos($realPath, $baseRealPath) !== 0) {
-            return ['success' => true]; // File doesn't exist, that's ok
+            return true; // File doesn't exist, that's ok
         }
 
-        // Delete file
         if (file_exists($realPath)) {
             if (!unlink($realPath)) {
-                return ['success' => false, 'error' => 'Failed to delete file'];
+                return false;
             }
 
             // Try to clean up empty date folder
             $dateFolder = dirname($realPath);
-            if (is_dir($dateFolder) && count(scandir($dateFolder)) == 2) { // . and ..
+            if (is_dir($dateFolder) && count(scandir($dateFolder)) == 2) {
                 @rmdir($dateFolder);
             }
         }
 
-        return ['success' => true];
+        return true;
     }
 
     /**
-     * Get image URL for frontend
+     * Delete all images for a post
+     * 
+     * @param array $images Array of image data from database
+     * @return bool Success
      */
-    public static function getImageUrl(string $relativePath): string {
-        if (empty($relativePath)) {
-            return '';
+    public static function deleteAllImages(array $images): bool {
+        $success = true;
+        
+        foreach ($images as $image) {
+            if (isset($image['path'])) {
+                if (!self::deleteImage($image['path'])) {
+                    $success = false;
+                }
+            }
         }
-        return '/assets/images/' . $relativePath;
+
+        return $success;
     }
 }
 
 /**
- * Convenience functions for use in posts.php
+ * Convenience function
  */
-function uploadFeaturedImage(array $file): array {
-    return FeaturedImageUploader::upload($file);
-}
-
-function deleteFeaturedImage(string $path): array {
-    return FeaturedImageUploader::delete($path);
-}
-
-function getFeaturedImageUrl(string $path): string {
-    return FeaturedImageUploader::getImageUrl($path);
+function deletePostImages(array $images): bool {
+    return PostImageUploader::deleteAllImages($images);
 }

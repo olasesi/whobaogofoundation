@@ -633,7 +633,7 @@ $archives = $pdo->query(
               $recentDate = new DateTime($recent['published_at']);
             ?>
             <li class="recent-post-item">
-              <a href="/<?= htmlspecialchars($recent['slug']) ?>">
+              <a href="<?= $_ENV['BASE_URL'] . htmlspecialchars($recent['slug']) ?>">
                 • <?= htmlspecialchars($recent['title']) ?>
               </a>
               <div class="recent-post-date"><?= $recentDate->format('d/m/Y') ?></div>
@@ -649,7 +649,7 @@ $archives = $pdo->query(
           <ul class="recent-posts-list">
             <?php foreach (array_slice($recentPosts, 0, 2) as $recent): ?>
             <li class="recent-post-item">
-              <a href="/<?= htmlspecialchars($recent['slug']) ?>" style="color: var(--red); text-transform: uppercase;">
+              <a href="<?= $_ENV['BASE_URL'] . htmlspecialchars($recent['slug']) ?>" style="color: var(--red); text-transform: uppercase;">
                 <?= htmlspecialchars(strtoupper(substr($recent['title'], 0, 40))) ?>...
               </a>
               <div class="recent-post-date">

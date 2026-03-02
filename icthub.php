@@ -262,9 +262,9 @@ include './includes/header.php';
 
     <!-- Application Button -->
     <div class="apply-section">
-      <a href="#" class="apply-btn-image">
+      <a href="#" class="apply-btn-image" src="https://cohort.whobaogofoundation.org/" target="_blank">
         <img src="/assets/images/apply-now-btn.png" alt="ICT Hub Application - Click Here"
-             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22150%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22500%22 height=%22150%22 rx=%2275%22/%3E%3Ctext x=%2250%25%22 y=%2235%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2224%22 font-weight=%22bold%22 fill=%22%23000%22%3EAPPLY NOW%3C/text%3E%3Ctext x=%2250%25%22 y=%2265%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2232%22 font-weight=%22bold%22 fill=%22%23000%22%3EICT HUB APPLICATION%3C/text%3E%3Ctext x=%2285%25%22 y=%2265%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2220%22 fill=%22%23F5A623%22%3ECLICK HERE%3C/text%3E%3C/svg%3E'">
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22150%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22500%22 height=%22150%22 rx=%2275%22/%3E%3Ctext x=%2250%25%22 y=%2235%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2224%22 font-weight=%22bold%22 fill=%22%23000%22%3EAPPLY NOW%3C/text%3E%3Ctext x=%2250%25%22 y=%2265%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2232%22 font-weight=%22bold%22 fill=%22%23000%22%3EICT HUB APPLICATION%3C/text%3E%3Ctext x=%2285%25%22 y=%2265%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2220%22 fill=%22%23F5A623%22%3E%3C/text%3E%3C/svg%3E'">
       </a>
     </div>
 

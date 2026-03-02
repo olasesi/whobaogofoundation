@@ -34,6 +34,19 @@ if (!$post) {
 $updateStmt = $pdo->prepare("UPDATE posts SET views = views + 1 WHERE id = :id");
 $updateStmt->execute([':id' => $post['id']]);
 
+// Parse post images
+$postImages = [];
+if ($post['post_images']) {
+    try {
+        $postImages = json_decode($post['post_images'], true);
+        if (!is_array($postImages)) {
+            $postImages = [];
+        }
+    } catch (Exception $e) {
+        $postImages = [];
+    }
+}
+
 // Get related posts (same category, excluding current)
 $relatedPosts = [];
 if ($post['category_id']) {
@@ -119,8 +132,6 @@ $publishedDate = new DateTime($post['published_at']);
 include './includes/header.php';
 
 ?>
-
-
 
 <style>
     /* ── PAGE HERO ─────────────────────────────────── */
@@ -254,12 +265,31 @@ include './includes/header.php';
         object-fit: cover;
     }
 
-    /* ── POST IMAGES (5 slots) ─────────────────────── */
-    .post-images {
+    /* ── POST IMAGES (distributed throughout) ─────── */
+    .post-images-gallery {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
         margin: 2rem 0;
+    }
+
+    /* Two-column layout for 2+ images */
+    .post-images-gallery.layout-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Single image */
+    .post-images-gallery.layout-1 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Three column layout for 3+ images */
+    .post-images-gallery.layout-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Four+ images - grid layout */
+    .post-images-gallery.layout-4plus {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
 
     .post-image-item {
@@ -280,6 +310,15 @@ include './includes/header.php';
         height: 250px;
         object-fit: cover;
         display: block;
+    }
+
+    /* Full width image */
+    .post-image-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .post-image-item.full-width img {
+        height: 350px;
     }
 
     /* ── POST CONTENT ──────────────────────────────── */
@@ -662,6 +701,14 @@ include './includes/header.php';
         .related-grid {
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
+
+        .post-images-gallery.layout-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .post-images-gallery.layout-3 {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     @media (max-width: 768px) {
@@ -677,8 +724,12 @@ include './includes/header.php';
             font-size: 0.95rem;
         }
 
-        .post-images {
-            grid-template-columns: 1fr;
+        .post-images-gallery {
+            grid-template-columns: 1fr !important;
+        }
+
+        .post-image-item.full-width {
+            grid-column: 1;
         }
     }
 </style>
@@ -734,7 +785,7 @@ include './includes/header.php';
                 <!-- Featured Image -->
                 <?php if ($post['featured_image']): ?>
                     <div class="post-featured-image">
-                        <img src="<?= htmlspecialchars($post['featured_image']) ?>" 
+                        <img src="<?= $_ENV['BASE_URL'] . 'assets/images/' . htmlspecialchars($post['featured_image']) ?>" 
                              alt="<?= htmlspecialchars($post['title']) ?>"
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221200%22 height=%22600%22%3E%3Crect fill=%22%23E0F7F2%22 width=%221200%22 height=%22600%22/%3E%3C/svg%3E'">
                     </div>
@@ -744,6 +795,48 @@ include './includes/header.php';
                 <div class="post-body">
                     <?= $post['content']; ?>
                 </div>
+
+                <!-- POST IMAGES - Distributed throughout ──────────────────────── -->
+<!-- POST IMAGES - Distributed throughout ──────────────────────── -->
+<!-- POST IMAGES - Distributed throughout ──────────────────────── -->
+                <?php if (!empty($postImages)): 
+                    $imageCount = count($postImages);
+                    $layoutClass = 'layout-1';
+                    
+                    // Determine layout based on image count
+                    if ($imageCount === 1) {
+                        $layoutClass = 'layout-1';
+                    } elseif ($imageCount === 2) {
+                        $layoutClass = 'layout-2';
+                    } elseif ($imageCount === 3) {
+                        $layoutClass = 'layout-3';
+                    } else {
+                        $layoutClass = 'layout-4plus';
+                    }
+                ?>
+                <div class="post-images-gallery <?= $layoutClass ?>">
+                    <?php foreach ($postImages as $index => $image): 
+                        $isLastImage = ($index === count($postImages) - 1);
+                        $isFirstImage = ($index === 0);
+                        $isMidImage = ($index === 1 || $index === 2);
+                        
+                        // Build absolute image URL
+                        $imageUrl = $image['url']; // Already has /assets/images/...
+                        
+                        // If it starts with /, prepend the base URL
+                        if (strpos($imageUrl, '/') === 0) {
+                            $imageUrl = $_ENV['BASE_URL'] . ltrim($imageUrl, '/');
+                        }
+                    ?>
+                    <div class="post-image-item <?php if ($isLastImage && count($postImages) % 2 !== 0 && $layoutClass === 'layout-2') echo 'full-width'; ?>">
+                        <!-- ✓ FIXED: Build absolute URL with BASE_URL -->
+                        <img src="<?= htmlspecialchars($imageUrl) ?>" 
+                             alt="Post image <?= $image['index'] ?>"
+                             loading="lazy">
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
 
                 <!-- Post Footer -->
                 <div class="post-footer">

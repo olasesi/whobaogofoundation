@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/featured-image-uploader.php';
+require_once __DIR__ . '/includes/post-image-uploader.php';
 
 // Guard — must be logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -58,7 +59,48 @@ $categories = $pdo->query(
     "SELECT id, name FROM categories WHERE post_type = 'post' ORDER BY name"
 )->fetchAll();
 
-// ── CREATE / EDIT POST ────────────────────────────────────
+// ── DELETE POST (WITH IMAGE CLEANUP) ────────────────────────────────────────────
+
+if ($action === 'delete' && $id) {
+    try {
+        $checkStmt = $pdo->prepare("SELECT author_id, featured_image, post_images FROM posts WHERE id = :id");
+        $checkStmt->execute([':id' => $id]);
+        $post = $checkStmt->fetch();
+
+        if (!$post) {
+            $error = 'Post not found.';
+        } elseif ($post['author_id'] != $adminId && $adminRole !== 'super_admin' && $adminRole !== 'editor') {
+            $error = 'You do not have permission to delete this post.';
+        } else {
+            // Delete featured image if exists
+            if ($post['featured_image']) {
+                deleteFeaturedImage($post['featured_image']);
+            }
+
+            // Delete post images if exist
+            if ($post['post_images']) {
+                try {
+                    $images = json_decode($post['post_images'], true);
+                    if (is_array($images)) {
+                        deletePostImages($images);
+                    }
+                } catch (Exception $e) {
+                    // If JSON decode fails, just continue with deletion
+                }
+            }
+
+            // Delete post from database
+            $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
+            $deleteStmt->execute([':id' => $id]);
+            $message = 'Post and all images deleted successfully!';
+            $action = 'list';
+        }
+    } catch (Exception $e) {
+        $error = 'Error deleting post: ' . $e->getMessage();
+    }
+}
+
+// ── CREATE / EDIT POST (WITH POST IMAGES) ────────────────────────────────────────────
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'])) {
     $title = isset($_POST['title']) ? trim($_POST['title']) : '';
@@ -79,6 +121,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
     $meta_keywords = isset($_POST['meta_keywords']) ? trim($_POST['meta_keywords']) : '';
     $published_at = null;
     $scheduled_at = null;
+    
+    // Handle post images (JSON from AJAX upload)
+    $post_images = null;
+    if (isset($_POST['post_image_paths'])) {
+        try {
+            $imagePaths = json_decode($_POST['post_image_paths'], true);
+            if (is_array($imagePaths) && !empty($imagePaths)) {
+                $post_images = json_encode($imagePaths);
+            }
+        } catch (Exception $e) {
+            // If JSON decode fails, just ignore images
+        }
+    }
 
     // Handle published date
     if (isset($_POST['published_at']) && $_POST['published_at']) {
@@ -117,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                     if ($uploadResult['success']) {
                         $featured_image = $uploadResult['path'];
                     } else {
-                        $error = 'Image upload failed: ' . $uploadResult['error'];
+                        $error = 'Featured image upload failed: ' . $uploadResult['error'];
                         $featured_image = null;
                     }
                 }
@@ -126,11 +181,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                     $stmt = $pdo->prepare("
                         INSERT INTO posts 
                         (author_id, category_id, post_type, title, slug, excerpt, content, 
-                         featured_image, status, visibility, allow_comments, is_featured, 
+                         featured_image, post_images, status, visibility, allow_comments, is_featured, 
                          published_at, scheduled_at, meta_title, meta_description, meta_keywords)
                         VALUES 
                         (:author_id, :category_id, 'post', :title, :slug, :excerpt, :content,
-                         :featured_image, :status, :visibility, :allow_comments, :is_featured,
+                         :featured_image, :post_images, :status, :visibility, :allow_comments, :is_featured,
                          :published_at, :scheduled_at, :meta_title, :meta_description, :meta_keywords)
                     ");
 
@@ -142,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                         ':excerpt' => $excerpt,
                         ':content' => $content,
                         ':featured_image' => $featured_image,
+                        ':post_images' => $post_images,
                         ':status' => $status,
                         ':visibility' => $visibility,
                         ':allow_comments' => $allow_comments,
@@ -159,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
 
             } elseif ($action === 'edit' && $id) {
                 // Check ownership
-                $checkStmt = $pdo->prepare("SELECT author_id, featured_image FROM posts WHERE id = :id");
+                $checkStmt = $pdo->prepare("SELECT author_id, featured_image, post_images FROM posts WHERE id = :id");
                 $checkStmt->execute([':id' => $id]);
                 $post = $checkStmt->fetch();
 
@@ -179,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                             }
                             $featured_image = $uploadResult['path'];
                         } else {
-                            $error = 'Image upload failed: ' . $uploadResult['error'];
+                            $error = 'Featured image upload failed: ' . $uploadResult['error'];
                         }
                     }
 
@@ -199,6 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                                 excerpt = :excerpt,
                                 content = :content,
                                 featured_image = :featured_image,
+                                post_images = :post_images,
                                 status = :status,
                                 visibility = :visibility,
                                 allow_comments = :allow_comments,
@@ -220,6 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
                             ':excerpt' => $excerpt,
                             ':content' => $content,
                             ':featured_image' => $featured_image,
+                            ':post_images' => $post_images,
                             ':status' => $status,
                             ':visibility' => $visibility,
                             ':allow_comments' => $allow_comments,
@@ -241,33 +299,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['create', 'edit'
         } catch (Exception $e) {
             $error = 'Database error: ' . $e->getMessage();
         }
-    }
-}
-
-// ── DELETE POST ────────────────────────────────────────────
-
-if ($action === 'delete' && $id) {
-    try {
-        $checkStmt = $pdo->prepare("SELECT author_id, featured_image FROM posts WHERE id = :id");
-        $checkStmt->execute([':id' => $id]);
-        $post = $checkStmt->fetch();
-
-        if (!$post) {
-            $error = 'Post not found.';
-        } elseif ($post['author_id'] != $adminId && $adminRole !== 'super_admin' && $adminRole !== 'editor') {
-            $error = 'You do not have permission to delete this post.';
-        } else {
-            if ($post['featured_image']) {
-                deleteFeaturedImage($post['featured_image']);
-            }
-
-            $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
-            $deleteStmt->execute([':id' => $id]);
-            $message = 'Post deleted successfully!';
-            $action = 'list';
-        }
-    } catch (Exception $e) {
-        $error = 'Error deleting post: ' . $e->getMessage();
     }
 }
 
@@ -300,6 +331,7 @@ if ($action === 'list') {
 // ── GET POST FOR EDITING ───────────────────────────────────
 
 $editPost = null;
+$existingPostImages = [];
 if ($action === 'edit' && $id) {
     $stmt = $pdo->prepare("SELECT * FROM posts WHERE id = :id AND post_type = 'post'");
     $stmt->execute([':id' => $id]);
@@ -310,6 +342,18 @@ if ($action === 'edit' && $id) {
             $error = 'You do not have permission to edit this post.';
             $action = 'list';
             $editPost = null;
+        } else {
+            // Parse existing post images
+            if ($editPost['post_images']) {
+                try {
+                    $existingPostImages = json_decode($editPost['post_images'], true);
+                    if (!is_array($existingPostImages)) {
+                        $existingPostImages = [];
+                    }
+                } catch (Exception $e) {
+                    $existingPostImages = [];
+                }
+            }
         }
     } else {
         $error = 'Post not found.';
@@ -463,6 +507,75 @@ if ($action === 'edit' && $id) {
       border-color: var(--teal);
       background: var(--teal-soft);
       padding: 0.5rem;
+    }
+
+    /* Existing images display */
+    .existing-images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: var(--surface);
+      border-radius: var(--r-sm);
+      border-left: 4px solid var(--teal);
+    }
+
+    .existing-image-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .existing-image-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .existing-image-label {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--ink-light);
+      background: white;
+      margin: 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .featured-image-preview {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .featured-image-preview img {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .featured-image-info {
+      flex: 1;
+    }
+
+    .featured-image-info p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ink-mid);
+    }
+
+    .featured-image-info .filename {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
     }
 
     /* TinyMCE Custom Styling */
@@ -809,9 +922,9 @@ if ($action === 'edit' && $id) {
                 <td><?= timeAgo($post['created_at']) ?></td>
                 <td>
                   <div class="row-actions">
-                    <a href="posts.php?action=edit&id=<?= (int)$post['id'] ?>">
+                    <!-- <a href="posts.php?action=edit&id=<?= (int)$post['id'] ?>">
                       <button class="act-btn edit" title="Edit">✏</button>
-                    </a>
+                    </a> -->
                     <a href="posts.php?action=delete&id=<?= (int)$post['id'] ?>"
                        onclick="return confirm('Are you sure? This cannot be undone.')">
                       <button class="act-btn delete" title="Delete">🗑</button>
@@ -840,7 +953,7 @@ if ($action === 'edit' && $id) {
       </div>
       <?php endif; ?>
 
-      <form method="POST" enctype="multipart/form-data" class="form-card">
+      <form method="POST" enctype="multipart/form-data" class="form-card" onsubmit="return uploadPostImages(event);">
         
         <!-- Basic Info -->
         <div class="form-grid">
@@ -923,9 +1036,50 @@ if ($action === 'edit' && $id) {
           <span class="form-hint">Paste formatted content directly - it will maintain formatting!</span>
         </div>
 
+        <!-- Featured Image -->
+        <div class="form-group full">
+          <label class="form-label">Featured Image</label>
+          <input type="file" name="featured_image" class="form-input" accept="image/*">
+          <span class="form-hint">Recommended: 760×510px. Formats: JPG, PNG, WebP</span>
+          
+          <!-- DISPLAY EXISTING FEATURED IMAGE (EDIT MODE) -->
+          <?php if ($editPost && $editPost['featured_image']): ?>
+          <div class="featured-image-preview">
+            <img src="<?=$_ENV['BASE_URL'] ?>assets/images/<?= htmlspecialchars($editPost['featured_image']) ?>" 
+                 alt="Current featured image">
+            <div class="featured-image-info">
+              <p class="filename">Current Featured Image:</p>
+              <p><?= htmlspecialchars($editPost['featured_image']) ?></p>
+              <p style="color: var(--red); font-size: 0.75rem; margin-top: 0.5rem;">↑ Upload new image above to replace</p>
+            </div>
+          </div>
+          <?php endif; ?>
+        </div>
+
+        <!-- DISPLAY EXISTING POST IMAGES (EDIT MODE) -->
+        <?php if (!empty($existingPostImages)): ?>
+        <div class="form-group full">
+          <label class="form-label">Current Post Images (<?= count($existingPostImages) ?>)</label>
+          <div class="existing-images-grid">
+            <?php foreach ($existingPostImages as $image): ?>
+            <div class="existing-image-item">
+              <img src="<?= $_ENV['BASE_URL'] .htmlspecialchars($image['url']) ?>" alt="Post image <?= $image['index'] ?>">
+              <p class="existing-image-label">Image <?= $image['index'] ?></p>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--ink-mid); margin-bottom: 1.5rem;">
+            ℹ️ To change these images, upload new ones in the slots below. Your new uploads will replace the current ones when you save.
+          </p>
+        </div>
+        <?php endif; ?>
+
         <!-- Image Upload Slots (5) -->
         <div class="form-group full">
           <label class="form-label">Post Images (Up to 5)</label>
+          <?php if (empty($existingPostImages)): ?>
+          <span class="form-hint" style="margin-bottom: 1rem; display: block;">No images yet. Upload up to 5 images below.</span>
+          <?php endif; ?>
           <div class="image-slots" id="imageSlots">
             <?php for ($i = 1; $i <= 5; $i++): ?>
             <label class="image-slot" id="slot<?= $i ?>">
@@ -935,17 +1089,7 @@ if ($action === 'edit' && $id) {
             </label>
             <?php endfor; ?>
           </div>
-          <span class="form-hint">Click any slot to upload an image. Images will display in your post.</span>
-        </div>
-
-        <!-- Featured Image -->
-        <div class="form-group full">
-          <label class="form-label">Featured Image</label>
-          <input type="file" name="featured_image" class="form-input" accept="image/*">
-          <span class="form-hint">Recommended: 760×510px. Formats: JPG, PNG, WebP</span>
-          <?php if ($editPost && $editPost['featured_image']): ?>
-          <span class="form-hint" style="color: var(--teal);">Current: <?= htmlspecialchars($editPost['featured_image']) ?></span>
-          <?php endif; ?>
+          <span class="form-hint">Click any slot to upload an image. Click ✕ to remove. New images will replace old ones.</span>
         </div>
 
         <!-- SEO Section -->
@@ -1036,7 +1180,7 @@ if ($action === 'edit' && $id) {
     });
   }
 
-  // Form submission
+  // Form submission - TinyMCE content
   const form = document.querySelector('form.form-card');
   if (form) {
     form.addEventListener('submit', function(e) {
@@ -1083,19 +1227,177 @@ if ($action === 'edit' && $id) {
     }
   }
 
-  // Preview uploaded images in slots
+  // Preview uploaded images in slots with delete button - FIXED
   function previewImage(event, slotNumber) {
     const file = event.target.files[0];
     const slot = document.getElementById('slot' + slotNumber);
+    const fileInput = event.target;
     
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        slot.innerHTML = `<img src="${e.target.result}" alt="Image ${slotNumber}">`;
-        slot.classList.add('filled');
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const previewContainer = document.createElement('div');
+      previewContainer.style.cssText = 'position: relative; width: 100%; height: 100%; border-radius: 4px; overflow: hidden;';
+      
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.alt = 'Image ' + slotNumber;
+      img.style.cssText = 'width: 100%; height: 100%; object-fit: cover; display: block;';
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.textContent = '✕';
+      deleteBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.9); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10;';
+      
+      deleteBtn.onclick = function(evt) {
+        deleteImage(evt, slotNumber, fileInput);
       };
-      reader.readAsDataURL(file);
+      
+      previewContainer.appendChild(img);
+      previewContainer.appendChild(deleteBtn);
+      
+      while (slot.firstChild) {
+        if (slot.firstChild.tagName !== 'INPUT') {
+          slot.removeChild(slot.firstChild);
+        } else {
+          slot.firstChild.style.display = 'none';
+          slot.appendChild(previewContainer);
+          break;
+        }
+      }
+      
+      slot.classList.add('filled');
+      slot.style.padding = '0';
+    };
+    
+    reader.readAsDataURL(file);
+  }
+
+  // Delete image from slot
+  function deleteImage(event, slotNumber, fileInput) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const slot = document.getElementById('slot' + slotNumber);
+    
+    if (fileInput) {
+      fileInput.value = '';
+      fileInput.style.display = 'block';
     }
+    
+    const preview = slot.querySelector('div[style*="position: relative"]');
+    if (preview) {
+      preview.remove();
+    }
+    
+    slot.classList.remove('filled');
+    slot.style.padding = '1rem';
+  }
+
+  // Upload images via AJAX
+  function uploadPostImages(event) {
+    event.preventDefault();
+    
+    const formElement = event.target;
+    const uploads = [];
+   
+    for (let i = 1; i <= 5; i++) {
+      const slot = document.getElementById('slot' + i);
+      const fileInput = slot ? slot.querySelector(`input[name="post_image_${i}"]`) : null;
+      
+      if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        uploads.push({
+          index: i,
+          file: fileInput.files[0]
+        });
+      }
+    }
+ 
+    if (uploads.length === 0) {
+      if (typeof tinymce !== 'undefined' && tinymce.get('editor')) {
+        const editorContent = tinymce.get('editor').getContent();
+        const contentField = document.querySelector('textarea[name="content"]');
+        if (contentField) {
+          contentField.value = editorContent;
+        }
+      }
+      return true;
+    }
+
+    const submitBtn = formElement.querySelector('.btn-primary');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Uploading images...';
+    submitBtn.disabled = true;
+
+    let uploadedCount = 0;
+    let imagePaths = [];
+    let hasError = false;
+
+    uploads.forEach((upload) => {
+      const formData = new FormData();
+      formData.append('image', upload.file);
+      
+      fetch('/whobaogofoundation/admin/includes/upload-post-images.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Server error ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        uploadedCount++;
+        
+        if (data.success) {
+          imagePaths.push({
+            index: upload.index,
+            path: data.path,
+            url: data.url
+          });
+        } else {
+          hasError = true;
+        }
+
+        if (uploadedCount === uploads.length) {
+          if (hasError) {
+            alert('Some images failed to upload, but continuing with post submission.');
+          }
+
+          if (typeof tinymce !== 'undefined' && tinymce.get('editor')) {
+            const editorContent = tinymce.get('editor').getContent();
+            const contentField = document.querySelector('textarea[name="content"]');
+            if (contentField) {
+              contentField.value = editorContent;
+            }
+          }
+
+          if (imagePaths.length > 0) {
+            const imagePathsInput = document.createElement('input');
+            imagePathsInput.type = 'hidden';
+            imagePathsInput.name = 'post_image_paths';
+            imagePathsInput.value = JSON.stringify(imagePaths);
+            formElement.appendChild(imagePathsInput);
+          }
+
+          formElement.submit();
+        }
+      })
+      .catch(error => {
+        uploadedCount++;
+        hasError = true;
+        
+        if (uploadedCount === uploads.length) {
+          alert('Image upload failed. Please try again.\n\nError: ' + error.message);
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        }
+      });
+    });
+
+    return false;
   }
 </script>
 

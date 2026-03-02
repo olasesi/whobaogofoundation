@@ -53,17 +53,106 @@ include './includes/header.php';
     gap: 4rem;
     align-items: flex-start;
   }
-  .about-intro-img {
+
+  /* ── CAROUSEL STYLES ───────────────────────────── */
+  .carousel-container {
+    position: relative;
     border-radius: var(--r-2xl);
     overflow: hidden;
-    position: relative;
     aspect-ratio: 4/5;
+    background: #f5f5f5;
   }
-  .about-intro-img img {
+
+  .carousel-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+  }
+
+  .carousel-slide.active {
+    opacity: 1;
+  }
+
+  .carousel-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
+
+  /* Carousel Controls */
+  .carousel-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.8rem;
+    z-index: 10;
+  }
+
+  .carousel-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    border: none;
+    padding: 0;
+  }
+
+  .carousel-dot.active {
+    background: #fff;
+    transform: scale(1.2);
+  }
+
+  .carousel-dot:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Carousel Arrows */
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+    z-index: 10;
+  }
+
+  .carousel-arrow:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .carousel-arrow.prev {
+    left: 1rem;
+  }
+
+  .carousel-arrow.next {
+    right: 1rem;
+  }
+
   .about-label {
     font-size: 0.72rem;
     font-weight: 800;
@@ -137,6 +226,7 @@ include './includes/header.php';
     justify-content: center;
     font-size: 0.9rem;
     transition: transform 0.3s;
+    border: none;
   }
   .accordion-header.active .accordion-toggle { transform: rotate(45deg); }
   .accordion-body {
@@ -210,6 +300,8 @@ include './includes/header.php';
     padding: 0.75rem 1.8rem;
     border-radius: 100px;
     transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+    cursor: pointer;
   }
   .join-btn:hover {
     background: var(--red);
@@ -240,7 +332,7 @@ include './includes/header.php';
       grid-template-columns: 1fr;
       gap: 2.5rem;
     }
-    .about-intro-img {
+    .carousel-container {
       order: -1;
       max-width: 400px;
       margin: 0 auto;
@@ -249,6 +341,17 @@ include './includes/header.php';
     .story-grid {
       grid-template-columns: 1fr;
       gap: 1.5rem;
+    }
+    .carousel-arrow {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+    .carousel-arrow.prev {
+      left: 0.5rem;
+    }
+    .carousel-arrow.next {
+      right: 0.5rem;
     }
   }
 </style>
@@ -271,10 +374,31 @@ include './includes/header.php';
 <section class="about-intro">
   <div class="wrap">
     <div class="about-intro-grid">
-      <!-- Image -->
-      <div class="about-intro-img">
-        <img src="/assets/images/about-intro.jpg" alt="We Serve Humanity"
-             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22400%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🤝%3C/text%3E%3C/svg%3E'">
+      <!-- Carousel -->
+      <div class="carousel-container">
+        <div class="carousel-track">
+          <!-- Slide 1 -->
+          <div class="carousel-slide active">
+            <img src="<?= $_ENV['BASE_URL'] ?>/assets/images/use-this.jpg" alt="We Serve Humanity"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22400%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🤝%3C/text%3E%3C/svg%3E'">
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="carousel-slide">
+            <img src="<?= $_ENV['BASE_URL'] ?>/assets/images/banner-3-1024x435.png" alt="Our Mission"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22400%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E❤️%3C/text%3E%3C/svg%3E'">
+          </div>
+        </div>
+
+        <!-- Carousel Controls -->
+        <div class="carousel-controls">
+          <button class="carousel-dot active" onclick="goToSlide(0)"></button>
+          <button class="carousel-dot" onclick="goToSlide(1)"></button>
+        </div>
+
+        <!-- Carousel Arrows -->
+        <button class="carousel-arrow prev" onclick="previousSlide()">‹</button>
+        <button class="carousel-arrow next" onclick="nextSlide()">›</button>
       </div>
 
       <!-- Content -->
@@ -370,7 +494,7 @@ include './includes/header.php';
         </div>
       </div>
 
-      <a href="/contact" class="join-btn">JOIN US NOW</a>
+      <a href="<?= $_ENV['BASE_URL'] ?>contact.php" class="join-btn">JOIN US NOW</a>
     </div>
   </div>
 </section>
@@ -386,7 +510,7 @@ include './includes/header.php';
     <div class="team-grid">
       <div class="team-card rev">
         <div class="team-avatar">
-          <img src="/assets/images/safiya.jpg" alt="Safiya Whoba"
+          <img src="<?= $_ENV['BASE_URL'] ?>assets/images/safiya.jpg" alt="Safiya Whoba"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
           <div class="team-init" style="display:none;">SW</div>
         </div>
@@ -396,7 +520,7 @@ include './includes/header.php';
 
       <div class="team-card rev">
         <div class="team-avatar">
-          <img src="/assets/images/whoba-ogo.jpg" alt="Whoba Ogo"
+          <img src="<?= $_ENV['BASE_URL'] ?>assets/images/whoba-ogo.jpg" alt="Whoba Ogo"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
           <div class="team-init" style="display:none;">WO</div>
         </div>
@@ -410,6 +534,36 @@ include './includes/header.php';
 </main>
 
 <script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.carousel-dot');
+
+  function showSlide(n) {
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    slides[n].classList.add('active');
+    dots[n].classList.add('active');
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  function previousSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  function goToSlide(n) {
+    currentSlide = n;
+    showSlide(currentSlide);
+  }
+
+  // Optional: Auto-advance carousel every 5 seconds
+  setInterval(nextSlide, 5000);
+
   function toggleAccordion(header) {
     const item = header.parentElement;
     const body = item.querySelector('.accordion-body');
