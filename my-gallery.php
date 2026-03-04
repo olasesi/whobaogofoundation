@@ -299,9 +299,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-water">
-        <?php for($i=1; $i<=5; $i++): ?>
+        <?php for($i=1; $i<=13; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'water')">
-          <img src="/assets/images/gallery/water-<?= $i ?>.jpg" alt="Water Project <?= $i ?>"
+          <img src="assets/images/water-<?= $i ?>.jpg" alt="Water Project <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E💧%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -321,9 +321,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-ssce2020">
-        <?php for($i=1; $i<=5; $i++): ?>
+        <?php for($i=1; $i<=11; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'ssce2020')">
-          <img src="/assets/images/gallery/ssce-2020-<?= $i ?>.jpg" alt="2020 SSCE Registration <?= $i ?>"
+          <img src="assets/images/ssce-2020-<?= $i ?>.jpg" alt="2020 SSCE Registration <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23FDE8E8%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23E03535%22%3E📚%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -345,7 +345,7 @@ include './includes/header.php';
       <div class="carousel-track" id="carousel-ssce2021">
         <?php for($i=1; $i<=5; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'ssce2021')">
-          <img src="/assets/images/gallery/ssce-2021-<?= $i ?>.jpg" alt="2021 SSCE Registration <?= $i ?>"
+          <img src="assets/images/ssce-2021-<?= $i ?>.jpg" alt="2021 SSCE Registration <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23FDE8E8%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23E03535%22%3E🎓%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -365,9 +365,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-visit">
-        <?php for($i=1; $i<=6; $i++): ?>
+        <?php for($i=1; $i<=18; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'visit')">
-          <img src="/assets/images/gallery/visit-<?= $i ?>.jpg" alt="School Visit <?= $i ?>"
+          <img src="assets/images/visit-<?= $i ?>.jpg" alt="School Visit <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23F5A623%22%3E🏫%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -387,9 +387,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-renovation">
-        <?php for($i=1; $i<=5; $i++): ?>
+        <?php for($i=1; $i<=12; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'renovation')">
-          <img src="/assets/images/gallery/renovation-<?= $i ?>.jpg" alt="School Renovation <?= $i ?>"
+          <img src="assets/images/renovation-<?= $i ?>.jpg" alt="School Renovation <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏗️%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
