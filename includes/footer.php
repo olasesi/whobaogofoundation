@@ -42,15 +42,14 @@
         <li><a href="icthub.php">Skill Development</a></li>
         <li><a href="our-work.php#education-support">Education Support</a></li>
         <li><a href="our-work.php#health-support">Health Support</a></li>
-        <li><a href="ict-hub.php">ICT Training Hub</a></li>
+        <li><a href="icthub.php">ICT Training Hub</a></li>
       </ul>
     </div>
 
     <div class="f-col">
       <h5>Get Involved</h5>
       <ul>
-        <li><a href="donate.php">Donate Now</a></li>
-        <li><a href="contact.php">Volunteer</a></li>
+        <li><a href="volunteer.php">Volunteer</a></li>
         <li><a href="contact.php">Partner With Us</a></li>
         <li><a href="testimonials.php">Testimonials</a></li>
       </ul>

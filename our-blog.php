@@ -539,7 +539,7 @@ $archives = $pdo->query(
             ?>
             <article class="blog-post-card">
               <div class="post-thumbnail">
-                <img src="/assets/images/blog/<?= $post['id'] ?>.jpg" alt="<?= htmlspecialchars($post['title']) ?>"
+                <img src="<?= $_ENV['BASE_URL'] ?>assets/images/<?= $post['featured_image'] ?>" alt="<?= htmlspecialchars($post['title']) ?>"
                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22680%22 height=%22510%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22680%22 height=%22510%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2260%22 fill=%22%230D9B7E%22%3E📰%3C/text%3E%3C/svg%3E'">
                 <div class="post-date-badge">
                   <span class="post-date-day"><?= $date->format('d') ?></span>

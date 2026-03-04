@@ -2,8 +2,19 @@
 require_once './includes/config.php';
 require_once './includes/db.php';
 include ('./includes/header.php');
-?>
 
+// Fetch recent posts from database
+$newsStmt = $pdo->prepare("
+  SELECT id, title, slug, excerpt, featured_image, category_id, published_at, 
+         (SELECT name FROM categories WHERE id = posts.category_id) AS category_name
+  FROM posts
+  WHERE post_type = 'post' AND status = 'published'
+  ORDER BY published_at DESC
+  LIMIT 6
+");
+$newsStmt->execute();
+$posts = $newsStmt->fetchAll();
+?>
 
 <main>
 
@@ -112,12 +123,33 @@ include ('./includes/header.php');
 <section class="sec">
   <div class="wrap">
     <div class="about-grid">
-      <div class="about-vis rev">
-        <div class="about-dots"><?php for($i=0;$i<30;$i++) echo '<i></i>'; ?></div>
-        <div class="about-blob">
-          <div class="about-blob-inner">🤝</div>
+      <!-- CAROUSEL - 2 IMAGES -->
+      <div class="about-vis rev" style="position: relative;">
+        <!-- Carousel Container -->
+        <div style="position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 16px; overflow: hidden; background: #f5f5f5;">
+          <!-- Slide 1 -->
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 1; transition: opacity 0.6s ease-in-out; display: flex; align-items: center; justify-content: center;" class="carousel-slide active">
+            <img src="./assets/images/DSC_0891-1024x679.jpg" alt="We Serve Humanity" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+
+          <!-- Slide 2 -->
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s ease-in-out; display: flex; align-items: center; justify-content: center;" class="carousel-slide">
+            <img src="./assets/images/IMG_8760-1024x683.jpg" alt="Our Mission" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+
+          <!-- Carousel Controls -->
+          <div style="position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.8rem; z-index: 10;">
+            <button onclick="homeCarouselGoTo(0)" style="width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); border: none; cursor: pointer; transition: all 0.3s;" class="carousel-dot active"></button>
+            <button onclick="homeCarouselGoTo(1)" style="width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); border: none; cursor: pointer; transition: all 0.3s;" class="carousel-dot"></button>
+          </div>
+
+          <!-- Carousel Arrows -->
+          <button onclick="homeCarouselPrev()" style="position: absolute; top: 50%; left: 1rem; transform: translateY(-50%); width: 48px; height: 48px; background: rgba(0,0,0,0.5); border: none; color: #fff; font-size: 24px; cursor: pointer; border-radius: 50%; transition: background 0.3s; z-index: 10;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">‹</button>
+          <button onclick="homeCarouselNext()" style="position: absolute; top: 50%; right: 1rem; transform: translateY(-50%); width: 48px; height: 48px; background: rgba(0,0,0,0.5); border: none; color: #fff; font-size: 24px; cursor: pointer; border-radius: 50%; transition: background 0.3s; z-index: 10;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">›</button>
         </div>
-        <div class="about-quote-card">
+
+        <!-- Quote Card -->
+        <div class="about-quote-card" style="margin-top: 2rem;">
           <p>"We hear their cry; we are here to stretch a hand to help."</p>
           <span>— Whoba Ogo Foundation</span>
         </div>
@@ -150,62 +182,37 @@ include ('./includes/header.php');
       <div class="eyebrow" style="justify-content:center;">To Humanity</div>
       <h2 class="hdg">How We Serve</h2>
     </div>
-    <div class="pillars-grid">
-      <div class="pillar-card rev d1">
-        <div class="pillar-ico red">🎯</div>
-        <h3>Our Mission</h3>
-        <p>Committed to enhancing the quality of life by supporting initiatives that bring tangible change to rural communities across Nigeria.</p>
-        <a href="about-us.php" class="pillar-arrow">Learn More →</a>
-      </div>
-      <div class="pillar-card rev d2">
-        <div class="pillar-ico teal">📋</div>
-        <h3>Our Program</h3>
-        <p>Our work is focused on providing health and educational support to the most vulnerable — children, the elderly, and rural families.</p>
-        <a href="our-work.php" class="pillar-arrow">Learn More →</a>
-      </div>
-      <div class="pillar-card rev d3">
-        <div class="pillar-ico sun">🤲</div>
-        <h3>Help &amp; Support</h3>
-        <p>Our work has gotten to another height through your generosity. Partner with us to stretch the helping hand even further.</p>
-        <a href="contact.php" class="pillar-arrow">Get Involved →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── PROGRAMS ──────────────────────────────────── -->
-<section class="sec">
-  <div class="wrap">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:0.5rem;" class="rev">
-      <div>
-        <div class="eyebrow">Our Work</div>
-        <h2 class="hdg">Our Programs</h2>
-      </div>
-      
-    </div>
     <div class="progs-grid">
-      <div class="prog-card red-card rev">
-        <div class="prog-body">
+      <!-- Card 1: Red with background image -->
+      <div class="prog-card red-card rev" style="background-image: url('./assets/images/computer_lad-scaled (1).jpg'); background-size: cover; background-position: center; position: relative;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1;"></div>
+        <div class="prog-body" style="position: relative; z-index: 2;">
           <div class="prog-ico">💻</div>
-          <h3>Skill Development Program</h3>
-          <p>Empowering youth with in-demand digital and vocational skills through our fully-equipped ICT Hub — completely tuition-free of charge.</p>
-          <a href="icthub.php" class="prog-link">Explore the Hub →</a>
+          <h3 style="color: #fff;">Skill Development Program</h3>
+          <p style="color: rgba(255,255,255,0.9);">Empowering youth with in-demand digital and vocational skills through our fully-equipped ICT Hub — completely tuition-free of charge.</p>
+          <a href="icthub.php" class="prog-link" style="color: #fff;">Explore the Hub →</a>
         </div>
       </div>
-      <div class="prog-card teal-card rev d1">
-        <div class="prog-body">
+
+      <!-- Card 2: Teal with background image -->
+      <div class="prog-card teal-card rev d1" style="background-image: url('./assets/images/IMG-20210224-WA0000 (1).jpg'); background-size: cover; background-position: center; position: relative;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1;"></div>
+        <div class="prog-body" style="position: relative; z-index: 2;">
           <div class="prog-ico">📚</div>
-          <h3>Education Support Program</h3>
-          <p>Supporting underprivileged SS3 students with mock examinations, study resources, and mentorship ahead of critical WAEC examinations.</p>
-          <a href="education-support.php" class="prog-link">Learn More →</a>
+          <h3 style="color: #fff;">Education Support Program</h3>
+          <p style="color: rgba(255,255,255,0.9);">Supporting underprivileged SS3 students with mock examinations, study resources, and mentorship ahead of critical WAEC examinations.</p>
+          <a href="education-support.php" class="prog-link" style="color: #fff;">Learn More →</a>
         </div>
       </div>
-      <div class="prog-card sun-card rev d2">
-        <div class="prog-body">
+
+      <!-- Card 3: Sun with background image -->
+      <div class="prog-card sun-card rev d2" style="background-image: url('./assets/images/IMG_8844-scaled (1).jpg'); background-size: cover; background-position: center; position: relative;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1;"></div>
+        <div class="prog-body" style="position: relative; z-index: 2;">
           <div class="prog-ico">🏥</div>
-          <h3>Health Support Program</h3>
-          <p>Bringing affordable, quality healthcare directly to rural communities where over 35% of Nigerians lack access to basic health services.</p>
-          <a href="health-support.php" class="prog-link">Learn More →</a>
+          <h3 style="color: #fff;">Health Support Program</h3>
+          <p style="color: rgba(255,255,255,0.9);">Bringing affordable, quality healthcare directly to rural communities where over 35% of Nigerians lack access to basic health services.</p>
+          <a href="health-support.php" class="prog-link" style="color: #fff;">Learn More →</a>
         </div>
       </div>
     </div>
@@ -276,7 +283,7 @@ include ('./includes/header.php');
   </div>
 </section>
 
-<!-- ── NEWS ───────────────────────────────────────── -->
+<!-- ── NEWS - DYNAMIC FROM DATABASE ───────────────────────────────────────── -->
 <section class="sec news-bg">
   <div class="wrap">
     <div class="news-hdr rev">
@@ -287,73 +294,47 @@ include ('./includes/header.php');
       <a href="our-blog.php" class="btn-outline">All News →</a>
     </div>
     <div class="news-grid">
-      <div class="nc feat rev">
-        <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#0D9B7E,#044030);"><img src="./assets/images/mock-770x532.jpg" alt="mock" title="Mock examination"/></div>
-          <div class="nc-date">10 DEC</div>
+      <?php if (!empty($posts)): ?>
+        <?php foreach ($posts as $index => $post): 
+          $publishedDate = new DateTime($post['published_at']);
+          $isFeature = ($index === 0); // First post is featured
+          $cardClass = $isFeature ? 'nc feat' : 'nc';
+          $delayClass = '';
+          if (!$isFeature) {
+            if ($index === 1) $delayClass = 'd1';
+            elseif ($index === 2) $delayClass = 'd2';
+          }
+        ?>
+        <div class="<?= $cardClass ?> rev <?= $delayClass ?>">
+          <div class="nc-img">
+            <div class="nc-img-inner" style="background:linear-gradient(135deg,#0D9B7E,#044030);">
+              <?php if ($post['featured_image']): ?>
+                <img src="<?= htmlspecialchars($_ENV['BASE_URL'] . 'assets/images/' . $post['featured_image']) ?>" 
+                     alt="<?= htmlspecialchars($post['title']) ?>" 
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22400%22 height=%22300%22/%3E%3C/svg%3E'">
+              <?php else: ?>
+                <div style="width: 100%; height: 100%; background: linear-gradient(135deg,#0D9B7E,#044030); display: flex; align-items: center; justify-content: center; font-size: 3rem;">📰</div>
+              <?php endif; ?>
+            </div>
+            <div class="nc-date"><?= $publishedDate->format('d M') ?></div>
+          </div>
+          <div class="nc-body">
+            <?php if ($post['category_name']): ?>
+              <div class="nc-cat"><?= htmlspecialchars($post['category_name']) ?></div>
+            <?php endif; ?>
+            <h4><?= htmlspecialchars($post['title']) ?></h4>
+            <?php if ($post['excerpt']): ?>
+              <p><?= htmlspecialchars(substr($post['excerpt'], 0, 120)) ?>...</p>
+            <?php endif; ?>
+            <a href="/<?= htmlspecialchars($post['slug']) ?>" class="nc-link">Read More →</a>
+          </div>
         </div>
-        <div class="nc-body">
-          <div class="nc-cat">Education</div>
-          <h4>Whoba Ogo Foundation SS3 Mock Examination Exercise</h4>
-          <p>Students across rural communities participated in our comprehensive mock examination programme, gaining crucial preparation ahead of their WAEC examinations.</p>
-          <a href="#" class="nc-link">Read More →</a>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #888;">
+          <p>No posts yet. Check back soon for updates!</p>
         </div>
-      </div>
-      <div class="nc rev d1">
-        <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#B8861B,#6A4700);"><img src="./assets/images/capture.jpg" alt="mock" title="Mock examination"/></div>
-          <div class="nc-date">19 SEP</div>
-        </div>
-        <div class="nc-body">
-          <div class="nc-cat">ICT Hub</div>
-          <h4>Outstanding Participant (Whoba Ogo Foundation Free ICT Training)</h4>
-          <a href="#" class="nc-link">Read More →</a>
-        </div>
-      </div>
-      <div class="nc rev d2">
-        <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#E03535,#7A1010);"><img src="./assets/images/image3.jpg" alt="Outstanding Participant" title="Outstanding Participant"/></div>
-          <div class="nc-date">01 APR</div>
-        </div>
-        <div class="nc-body">
-          <div class="nc-cat">ICT Hub</div>
-          <h4>Whoba Ogo Foundation (WOF) ICT Center — Empowering the Next Generation</h4>
-          <a href="#" class="nc-link">Read More →</a>
-        </div>
-      </div>
-      <div class="nc rev">
-        <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#076E58,#021A13);"><img src="./assets/images/cohort-3-training.jpg" alt="cohort-3-training" title="cohort-3-training"/></div>
-          <div class="nc-date">04 MAR</div>
-        </div>
-        <div class="nc-body">
-          <div class="nc-cat">ICT Hub</div>
-          <h4>WOF ICT Cohort 3 Tuition-Free Training Kicks Off with Over</h4>
-          <a href="#" class="nc-link">Read More →</a>
-        </div>
-      </div>
-      <div class="nc rev d1">
-        <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#3B5998,#1A2D5A);"><img src="./assets/images/wof3.jpg" alt="cohort-3-screen" title="cohort-3-screen"/></div>
-          <div class="nc-date">15 FEB</div>
-        </div>
-        <div class="nc-body">
-          <div class="nc-cat">ICT Hub</div>
-          <h4>WOF ICT Cohort 3 Screening Exercise: Over 450 Applicants</h4>
-          <a href="#" class="nc-link">Read More →</a>
-        </div>
-      </div>
-      <div class="nc rev d2">
-        <div class="nc-img">
-          <div class="nc-img-inner" style="background:linear-gradient(135deg,#7B3F00,#3D1F00);"><img src="./assets/images/wof-graduation.jpeg" alt="graduation" title="graduation"/></div>
-          <div class="nc-date">24 SEP</div>
-        </div>
-        <div class="nc-body">
-          <div class="nc-cat">ICT Hub</div>
-          <h4>WOF Graduation Ceremony of Cohort 1 and Orientation of Cohort 2</h4>
-          <a href="#" class="nc-link">Read More →</a>
-        </div>
-      </div>
+      <?php endif; ?>
     </div>
   </div>
 </section>
@@ -404,8 +385,43 @@ include ('./includes/header.php');
 
 </main>
 
-<?php include ('./includes/footer.php'); ?>
-<!-- ── FOOTER ─────────────────────────────────────── -->
+<script>
+  // Home carousel functionality
+  let homeCurrentSlide = 0;
+  const homeSlides = document.querySelectorAll('.carousel-slide');
+  const homeDots = document.querySelectorAll('.carousel-dot');
 
+  function homeShowSlide(n) {
+    homeSlides.forEach(slide => slide.style.opacity = '0');
+    homeDots.forEach(dot => dot.style.background = 'rgba(255,255,255,0.5)');
+    
+    homeSlides[n].style.opacity = '1';
+    homeDots[n].style.background = '#fff';
+    homeDots[n].style.transform = 'scale(1.2)';
+  }
+
+  function homeCarouselNext() {
+    homeCurrentSlide = (homeCurrentSlide + 1) % homeSlides.length;
+    homeShowSlide(homeCurrentSlide);
+  }
+
+  function homeCarouselPrev() {
+    homeCurrentSlide = (homeCurrentSlide - 1 + homeSlides.length) % homeSlides.length;
+    homeShowSlide(homeCurrentSlide);
+  }
+
+  function homeCarouselGoTo(n) {
+    homeCurrentSlide = n;
+    homeShowSlide(homeCurrentSlide);
+  }
+
+  // Auto-advance carousel every 5 seconds
+  setInterval(homeCarouselNext, 5000);
+
+  // Initialize
+  homeShowSlide(0);
+</script>
+
+<?php include ('./includes/footer.php'); ?>
 </body>
 </html>

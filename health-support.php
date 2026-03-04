@@ -67,19 +67,6 @@ include './includes/header.php';
   /* ── PROGRAMS SECTIONS ─────────────────────────── */
   .program-section {
     margin-bottom: 4rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-  }
-  .program-section.alt {
-    grid-template-columns: 1fr 1fr;
-  }
-  .program-section.alt .program-content {
-    order: 2;
-  }
-  .program-section.alt .program-image {
-    order: 1;
   }
 
   .program-number {
@@ -113,18 +100,6 @@ include './includes/header.php';
 
   .program-content p strong {
     font-weight: 700;
-  }
-
-  .program-image {
-    display: flex;
-    justify-content: center;
-  }
-
-  .program-image img {
-    width: 100%;
-    max-width: 450px;
-    border-radius: var(--r-sm);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   /* ── APPROACH SECTION ──────────────────────────── */
@@ -229,56 +204,59 @@ include './includes/header.php';
     margin: 0;
   }
 
-  /* ── PROGRAM SHOWCASE ──────────────────────────── */
-  .program-showcase {
-    margin-top: 4rem;
-  }
-
-  .showcase-title {
-    font-family: 'Fraunces', serif;
-    font-size: 1.3rem;
-    font-weight: 900;
-    color: var(--red);
-    margin-bottom: 2rem;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  .showcase-grid {
+  /* ── PROGRAM CARDS ─────────────────────────────── */
+  .program-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+    margin-top: 3rem;
   }
 
-  .showcase-card {
+  .prog-card {
     position: relative;
-    border-radius: var(--r-sm);
+    border-radius: var(--r-lg);
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    aspect-ratio: 1;
+    aspect-ratio: 4/3;
+    cursor: pointer;
+    transition: transform 0.3s;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
   }
 
-  .showcase-card img {
+  .prog-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .prog-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .showcase-badge {
+  .prog-card-overlay {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
-    background: #1db584;
-    color: #fff;
-    padding: 0.6rem 1.2rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-radius: 4px;
-    letter-spacing: 0.05em;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 50%);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
   }
 
-  /* ── RESPONSIVE ────────────────────────────────── */
+  .prog-card-badge {
+    background: var(--teal);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+  }
+
+  /* ── RESPONSIVE ────────────────────────────────– */
   @media (max-width: 768px) {
     .health-content {
       padding: 3rem 0;
@@ -286,18 +264,10 @@ include './includes/header.php';
     .health-container {
       padding: 0 1.25rem;
     }
-    .program-section {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    .program-section.alt .program-content,
-    .program-section.alt .program-image {
-      order: auto;
-    }
     .achievement-grid {
       grid-template-columns: 1fr;
     }
-    .showcase-grid {
+    .program-cards {
       grid-template-columns: 1fr;
     }
     .page-hero {
@@ -318,8 +288,7 @@ include './includes/header.php';
   <div class="breadcrumb">
     <a href="/">HOME</a>
     <span>/</span>
-    <a href="/our-work">OUR WORK</a>
-    <span>/</span>
+   
     <span>HEALTH SUPPORT</span>
   </div>
 </section>
@@ -332,58 +301,43 @@ include './includes/header.php';
 
     <!-- ── PROGRAM 1: HEALTH GRANTS ───────────────── -->
     <div class="program-section">
-      <div class="program-content">
-        <div class="program-number">1. HEALTH GRANTS</div>
-        <div class="program-title">Healthcare Funding & Support</div>
+      <div class="program-number">1. HEALTH GRANTS</div>
+      <div class="program-title">Healthcare Funding & Support</div>
 
-        <p>
-          We partner with hospitals by making grants available to them which they would use to foot the medical bill of patients who cannot afford to cater for the cost of treatment for their life-threatening medical ailments.
-        </p>
+      <p>
+        We partner with hospitals by making grants available to them which they would use to foot the medical bill of patients who cannot afford to cater for the cost of treatment for their life-threatening medical ailments.
+      </p>
 
-        <p>
-          Potential beneficiaries are vetted by a team consisting of at least a program officer from our organization and a member of the medical team directly overseeing the patient.
-        </p>
-      </div>
-      <div class="program-image">
-        <img src="/assets/images/health-grants.jpg" alt="Health Grants Program">
-      </div>
+      <p>
+        Potential beneficiaries are vetted by a team consisting of at least a program officer from our organization and a member of the medical team directly overseeing the patient.
+      </p>
     </div>
 
     <!-- ── PROGRAM 2: SICKLE CELL CAMPAIGN ──────────── -->
-    <div class="program-section alt">
-      <div class="program-image">
-        <img src="/assets/images/sickle-cell.jpg" alt="Save the Sickle Cell Child Campaign">
-      </div>
-      <div class="program-content">
-        <div class="program-number">2. Save the Sickle Cell Child Campaign (SSCC)</div>
-        <div class="program-title">Supporting Sickle Cell Patients</div>
+    <div class="program-section">
+      <div class="program-number">2. Save the Sickle Cell Child Campaign (SSCC)</div>
+      <div class="program-title">Supporting Sickle Cell Patients</div>
 
-        <p>
-          We have a very soft spot for the issue of the Sickle Cell Disease. This is especially because Nigeria currently holds the highest count on the number of children born annually with the Sickle Cell Disease globally.
-        </p>
+      <p>
+        We have a very soft spot for the issue of the Sickle Cell Disease. This is especially because Nigeria currently holds the highest count on the number of children born annually with the Sickle Cell Disease globally.
+      </p>
 
-        <p>
-          Our objective with this campaign is to reach as many rural communities as possible with information on ways to avoid the issue as well as the best available ways to manage victims of the Sickle Cell Disease to enable them to have as much a normal life as possible.
-        </p>
-      </div>
+      <p>
+        Our objective with this campaign is to reach as many rural communities as possible with information on ways to avoid the issue as well as the best available ways to manage victims of the Sickle Cell Disease to enable them to have as much a normal life as possible.
+      </p>
     </div>
 
     <!-- ── PROGRAM 3: HEALTH AND WELLNESS CAMPAIGNS ── -->
     <div class="program-section">
-      <div class="program-content">
-        <div class="program-number">3. Health and Wellness Campaigns</div>
-        <div class="program-title">Community Health Education</div>
+      <div class="program-number">3. Health and Wellness Campaigns</div>
+      <div class="program-title">Community Health Education</div>
 
-        <p>
-          Periodically, we carry out health awareness campaigns aimed at bringing basic information which everyone needs to know and apply in order to live at optimum health or at least mitigate avoidable health complications. These campaigns are usually comprised of health talks and basic medical tests which we provide free of charge to every member of our audience.
-        </p>
-      </div>
-      <div class="program-image">
-        <img src="/assets/images/health-wellness.jpg" alt="Health and Wellness Campaign">
-      </div>
+      <p>
+        Periodically, we carry out health awareness campaigns aimed at bringing basic information which everyone needs to know and apply in order to live at optimum health or at least mitigate avoidable health complications. These campaigns are usually comprised of health talks and basic medical tests which we provide free of charge to every member of our audience.
+      </p>
     </div>
 
-    <!-- ── OUR APPROACH ──────────────────────────── -->
+    <!-- ── OUR APPROACH ──────────────────────────– -->
     <div class="approach-section">
       <h3 class="approach-title">Let Save Humanity</h3>
       <div class="approach-content">
@@ -451,28 +405,6 @@ include './includes/header.php';
         <div style="display: flex; align-items: flex-start; gap: 1rem;">
           <div style="color: var(--red); font-size: 1.5rem; flex-shrink: 0;">▶</div>
           <p style="text-align: left; margin: 0;">Establish medical centers in locations where none exists to cater for the medical needs of the community dwellers.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── PROGRAM SHOWCASE ──────────────────────── -->
-    <div class="program-showcase">
-      <h3 class="showcase-title">Our Programs in Action</h3>
-      
-      <div class="showcase-grid">
-        <div class="showcase-card">
-          <img src="/assets/images/skill-development-program.jpg" alt="Skill Development Program">
-          <div class="showcase-badge">Skill Development Program</div>
-        </div>
-
-        <div class="showcase-card">
-          <img src="/assets/images/education-support-program.jpg" alt="Education Support Program">
-          <div class="showcase-badge">Education Support Program</div>
-        </div>
-
-        <div class="showcase-card">
-          <img src="/assets/images/health-support-program.jpg" alt="Health Support Program">
-          <div class="showcase-badge">Health Support Program</div>
         </div>
       </div>
     </div>

@@ -219,8 +219,8 @@ include './includes/header.php';
       <h1 class="program-title">Access to Education</h1>
 
       <div class="program-links">
-        <a href="#" class="program-link">Application Form</a>
-        <a href="#" class="program-link">Guarantors Form</a>
+        <a href="https://whobaogofoundation.org/wp-content/uploads/2021/02/Application-Form-1.pdf" class="program-link" target="_blank">Application Form</a>
+        <a href="https://whobaogofoundation.org/wp-content/uploads/2021/02/Guarantors-Form-1.pdf" class="program-link" target="_blank">Guarantors Form</a>
       </div>
 
       <div class="program-section">
@@ -282,14 +282,14 @@ include './includes/header.php';
         </p>
       </div>
 
-      <a href="/contact" class="read-more-btn">
+      <a href="school-of-nursing-scholarship.php" class="read-more-btn">
         ⓘ Read More
       </a>
 
       <!-- Program Cards -->
       <div class="program-cards">
         <div class="prog-card">
-          <img src="/assets/images/skill-development-card.jpg" alt="Skill Development Program"
+          <img src="assets/images/skd-scaled.jpg" alt="Skill Development Program"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23FDE8E8%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23E03535%22%3E💻%3C/text%3E%3C/svg%3E'">
           <div class="prog-card-overlay">
             <div class="prog-card-badge">SKILL DEVELOPMENT PROGRAM</div>
@@ -297,7 +297,7 @@ include './includes/header.php';
         </div>
 
         <div class="prog-card">
-          <img src="/assets/images/education-support-card.jpg" alt="Education Support Program"
+          <img src="assets/images/IMG-20210224-WA0000 (1).jpg" alt="Education Support Program"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E📚%3C/text%3E%3C/svg%3E'">
           <div class="prog-card-overlay">
             <div class="prog-card-badge">EDUCATION SUPPORT PROGRAM</div>
@@ -305,7 +305,7 @@ include './includes/header.php';
         </div>
 
         <div class="prog-card">
-          <img src="/assets/images/health-support-card.jpg" alt="Health Support Program"
+          <img src="assets/images/IMG_8844-scaled (1).jpg" alt="Health Support Program"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23F5A623%22%3E🏥%3C/text%3E%3C/svg%3E'">
           <div class="prog-card-overlay">
             <div class="prog-card-badge">HEALTH SUPPORT PROGRAM</div>

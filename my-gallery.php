@@ -240,7 +240,47 @@ include './includes/header.php';
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-medical">
         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
-          <img src="/assets/images/gallery/medical-1.jpg" alt="Medical Outreach"
+          <img src="assets/images/IMG-20191217-WA0001-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0003-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0004-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0007-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0009-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0010-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0011-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0013-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0017-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0018-1024x768.jpg" alt="Medical Outreach"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
+        </div>
+         <div class="carousel-item" onclick="openLightbox(0, 'medical')">
+          <img src="assets/images/IMG-20191217-WA0019-1024x768.jpg" alt="Medical Outreach"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E🏥%3C/text%3E%3C/svg%3E'">
         </div>
       </div>
