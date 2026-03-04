@@ -233,7 +233,7 @@ $posts = $newsStmt->fetchAll();
         <p class="mission-sub">
           There is a very loud outcry by this multitude of voiceless underprivileged Africans who are bewildered by the hopelessness of their situation. All they are asking for is a listening ear and helping hand.
         </p>
-        <a href="donate.php" class="btn-fill">Join Our Mission <span class="ico">♥</span></a>
+        <!-- <a href="donate.php" class="btn-fill">Join Our Mission <span class="ico">♥</span></a> -->
       </div>
       <div class="mission-facts">
         <div class="mfact">
@@ -326,7 +326,7 @@ $posts = $newsStmt->fetchAll();
             <?php if ($post['excerpt']): ?>
               <p><?= htmlspecialchars(substr($post['excerpt'], 0, 120)) ?>...</p>
             <?php endif; ?>
-            <a href="/<?= htmlspecialchars($post['slug']) ?>" class="nc-link">Read More →</a>
+            <a href="<?=$_ENV['BASE_URL'] . htmlspecialchars($post['slug']) ?>" class="nc-link">Read More →</a>
           </div>
         </div>
         <?php endforeach; ?>
@@ -345,7 +345,7 @@ $posts = $newsStmt->fetchAll();
     <div class="cta-card red rev">
       <h3>Help Us Touch More Lives</h3>
       <p>Your contribution — big or small — funds free ICT training, educational support, and healthcare access for those who need it most in Nigeria.</p>
-      <a href="donate.php" class="btn-white red-text">Donate Today ♥</a>
+      <a href="volunteer.php" class="btn-white red-text">Volunteer Today ♥</a>
     </div>
     <div class="cta-card teal rev d1">
       <h3>Get in Touch With Us</h3>
