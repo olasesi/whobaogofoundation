@@ -409,9 +409,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-newface">
-        <?php for($i=1; $i<=4; $i++): ?>
+        <?php for($i=1; $i<=19; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'newface')">
-          <img src="/assets/images/gallery/newface-<?= $i ?>.jpg" alt="New School Face <?= $i ?>"
+          <img src="assets/images/newface-<?= $i ?>.jpg" alt="New School Face <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23F5A623%22%3E✨%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -431,9 +431,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-widows">
-        <?php for($i=1; $i<=5; $i++): ?>
+        <?php for($i=1; $i<=6; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'widows')">
-          <img src="/assets/images/gallery/widows-<?= $i ?>.jpg" alt="Widow's Mite <?= $i ?>"
+          <img src="assets/images/widows-<?= $i ?>.jpg" alt="Widow's Mite <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23FDE8E8%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23E03535%22%3E❤️%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -453,9 +453,9 @@ include './includes/header.php';
 
     <div class="carousel-container">
       <div class="carousel-track" id="carousel-cobblers">
-        <?php for($i=1; $i<=5; $i++): ?>
+        <?php for($i=1; $i<=11; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'cobblers')">
-          <img src="/assets/images/gallery/cobblers-<?= $i ?>.jpg" alt="Cobbler Empowerment <?= $i ?>"
+          <img src="assets/images/cobblers-<?= $i ?>.jpg" alt="Cobbler Empowerment <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23E0F7F2%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%230D9B7E%22%3E👞%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
@@ -477,7 +477,7 @@ include './includes/header.php';
       <div class="carousel-track" id="carousel-church">
         <?php for($i=1; $i<=4; $i++): ?>
         <div class="carousel-item" onclick="openLightbox(<?= $i-1 ?>, 'church')">
-          <img src="/assets/images/gallery/church-<?= $i ?>.jpg" alt="Church Project <?= $i ?>"
+          <img src="assets/images/church-<?= $i ?>.jpg" alt="Church Project <?= $i ?>"
                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23FEF3DC%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2240%22 fill=%22%23F5A623%22%3E⛪%3C/text%3E%3C/svg%3E'">
         </div>
         <?php endfor; ?>
