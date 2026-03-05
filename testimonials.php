@@ -3,7 +3,7 @@ require_once './includes/config.php';
 require_once './includes/db.php';
 include './includes/header.php';
 
-// Handle form submission
+// Handle testimonial submission
 $success = '';
 $error = '';
 
@@ -16,9 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
         $error = 'All fields are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address.';
+    } elseif (strlen($comment) < 10) {
+        $error = 'Comment must be at least 10 characters.';
     } else {
         try {
-            // Insert comment with pending status
             $stmt = $pdo->prepare(
                 "INSERT INTO comments (post_id, author_name, author_email, author_ip, content, status, created_at)
                  VALUES (0, :name, :email, :ip, :content, 'pending', NOW())"
@@ -32,17 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
             ]);
             
             $success = 'Thank you! Your testimonial has been submitted and is awaiting approval.';
-            
-            // Clear form
             $_POST = [];
         } catch (PDOException $e) {
             $error = 'Something went wrong. Please try again later.';
-            error_log('Testimonial submission error: ' . $e->getMessage());
         }
     }
 }
 
-// Get approved testimonials (comments with post_id = 0 means they're testimonials)
+// Get approved testimonials
 $testimonials = $pdo->query(
     "SELECT author_name, author_email, content, created_at
      FROM comments
@@ -53,386 +51,151 @@ $testimonials = $pdo->query(
 $totalTestimonials = count($testimonials);
 ?>
 
-<style>
-      /* ── PAGE HERO BANNER ──────────────────────────── */
-  .page-hero {
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                url('/assets/images/about-hero-bg.jpg') center/cover;
-    min-height: 320px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2rem;
-    position: relative;
-  }
-  .page-hero-content h1 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 900;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-  }
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: rgba(224,53,53,0.9);
-    padding: 0.8rem 1.5rem;
-    border-radius: 100px;
-  }
-  .breadcrumb a,
-  .breadcrumb span {
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  .breadcrumb a:hover { opacity: 0.8; }
-  .breadcrumb span { opacity: 0.7; }
-
-  /* ── TESTIMONIALS PAGE ─────────────────────────── */
-  .testimonials-container {
-    padding: 4rem 0;
-  }
-  
-  .testimonials-header {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  .testimonials-count {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 3rem;
-  }
-  .testimonials-count::before {
-    content: '💬';
-    font-size: 1.2rem;
-  }
-
-  /* ── TESTIMONIAL ITEM ──────────────────────────── */
-  .testimonials-list {
-    max-width: 900px;
-    margin: 0 auto 4rem;
-  }
-  .testimonial-item {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    transition: box-shadow 0.3s;
-  }
-  .testimonial-item:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  }
-  
-  .testimonial-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.2rem;
-  }
-  .testimonial-avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--red-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: var(--red);
-    flex-shrink: 0;
-  }
-  .testimonial-meta h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 0.2rem;
-    text-transform: uppercase;
-  }
-  .testimonial-date {
-    font-size: 0.8rem;
-    color: var(--red);
-    font-weight: 500;
-  }
-  
-  .testimonial-content {
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: var(--ink-mid);
-  }
-  .testimonial-content p {
-    margin-bottom: 1rem;
-  }
-  .testimonial-content p:last-child {
-    margin-bottom: 0;
-  }
-
-  /* ── COMMENT FORM ──────────────────────────────── */
-  .comment-form-section {
-    max-width: 900px;
-    margin: 0 auto;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    padding: 2.5rem;
-  }
-  .form-title {
-    font-family: 'Fraunces', serif;
-    font-size: 1.3rem;
-    font-weight: 900;
-    color: var(--ink);
-    text-transform: uppercase;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 2px solid var(--red);
-  }
-  
-  .alert {
-    padding: 1rem 1.2rem;
-    border-radius: var(--r-sm);
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-  }
-  .alert-success {
-    background: var(--teal-soft);
-    border: 1px solid var(--teal);
-    color: var(--teal-dark);
-  }
-  .alert-error {
-    background: var(--red-soft);
-    border: 1px solid var(--red);
-    color: var(--red-dark);
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  .form-group label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--ink-mid);
-    margin-bottom: 0.5rem;
-  }
-  .form-control {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    font-size: 0.9rem;
-    font-family: inherit;
-    color: var(--ink);
-    transition: border-color 0.2s;
-  }
-  .form-control:focus {
-    outline: none;
-    border-color: var(--red);
-  }
-  textarea.form-control {
-    min-height: 150px;
-    resize: vertical;
-  }
-  
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-  
-  .submit-btn {
-    background: var(--red);
-    color: #fff;
-    border: none;
-    padding: 0.9rem 2.5rem;
-    border-radius: var(--r-sm);
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .submit-btn:hover {
-    background: var(--red-dark);
-    transform: translateY(-1px);
-  }
-
-  /* ── EMPTY STATE ───────────────────────────────── */
-  .empty-testimonials {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--surface);
-    border-radius: var(--r-lg);
-    margin-bottom: 3rem;
-  }
-  .empty-testimonials-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-  .empty-testimonials h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--ink);
-    margin-bottom: 0.5rem;
-  }
-  .empty-testimonials p {
-    color: var(--ink-light);
-    font-size: 0.95rem;
-  }
-
-  /* ── RESPONSIVE ────────────────────────────────── */
-  @media (max-width: 768px) {
-    .testimonials-container {
-      padding: 2.5rem 0;
-    }
-    .testimonials-list,
-    .comment-form-section {
-      margin-left: 1.25rem;
-      margin-right: 1.25rem;
-    }
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-    .testimonial-item {
-      padding: 1.5rem;
-    }
-    .comment-form-section {
-      padding: 1.5rem;
-    }
-  }
-</style>
-
 <main>
 
-<!-- ── PAGE HERO ───────────────────────────────── -->
-<section class="page-hero">
-  <div class="page-hero-content">
-    <h1>Testimonials</h1>
-  </div>
-  <div class="breadcrumb">
-    <a href="/">HOME</a>
-    <span>/</span>
-    <span>TESTIMONIALS</span>
-  </div>
-</section>
-
-<!-- ── TESTIMONIALS CONTENT ───────────────────────  -->
-<section class="testimonials-container">
-  <div class="wrap">
-    
-    <div class="testimonials-header">
-      <div class="testimonials-count">COMMENT (<?= $totalTestimonials ?>)</div>
+  <!-- PAGE HERO -->
+  <section style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./assets/images/testimonials-bg.jpg') center/cover; min-height: 300px; display: flex; align-items: center; justify-content: space-between; padding: 3rem 2rem;">
+    <div>
+      <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: #fff;">Testimonials</h1>
     </div>
+    <div style="background: var(--primary); padding: 0.8rem 1.5rem; border-radius: 100px; color: #fff; font-weight: 600; font-size: 0.9rem;">
+      <a href="index.php" style="color: #fff; text-decoration: none;">HOME</a>
+      <span style="margin: 0 0.8rem;"> / </span>
+      <span>TESTIMONIALS</span>
+    </div>
+  </section>
 
-    <?php if (empty($testimonials)): ?>
-      <div class="empty-testimonials">
-        <div class="empty-testimonials-icon">💬</div>
-        <h3>No Testimonials Yet</h3>
-        <p>Be the first to share your experience with us!</p>
+  <!-- TESTIMONIALS SECTION -->
+  <section class="section">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <div class="section-subtitle">WHAT PEOPLE SAY</div>
+        <h2 class="section-title">Success Stories & Testimonials</h2>
+        <p style="color: var(--gray); font-size: 1rem; margin-top: 1rem;">
+          Hear from the people whose lives have been transformed by Whoba Ogo Foundation's programs.
+        </p>
+        <div style="margin-top: 1rem; font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+          💬 <?= $totalTestimonials ?> Testimonials
+        </div>
       </div>
-    <?php else: ?>
-      <div class="testimonials-list">
-        <?php foreach ($testimonials as $testimonial): 
-          $date = new DateTime($testimonial['created_at']);
-          $initials = '';
-          $nameParts = explode(' ', $testimonial['author_name']);
-          foreach ($nameParts as $part) {
-            if (!empty($part)) {
-              $initials .= strtoupper(substr($part, 0, 1));
-            }
-          }
-          $initials = substr($initials, 0, 2);
-        ?>
-        <div class="testimonial-item">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar"><?= $initials ?></div>
-            <div class="testimonial-meta">
-              <h3><?= htmlspecialchars($testimonial['author_name']) ?></h3>
-              <div class="testimonial-date"><?= $date->format('F j, Y g:i a') ?></div>
-            </div>
-          </div>
-          <div class="testimonial-content">
-            <?php 
-              // Split content by double newlines to create paragraphs
-              $paragraphs = preg_split('/\n\s*\n/', $testimonial['content']);
-              foreach ($paragraphs as $paragraph) {
-                if (trim($paragraph)) {
-                  echo '<p>' . nl2br(htmlspecialchars(trim($paragraph))) . '</p>';
-                }
+
+      <!-- TESTIMONIALS GRID -->
+      <?php if (empty($testimonials)): ?>
+        <div style="text-align: center; padding: 4rem 2rem; background: var(--light-gray); border-radius: 12px; margin-bottom: 3rem;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+          <h3 style="font-size: 1.5rem; color: var(--dark); font-weight: 700; margin-bottom: 0.5rem;">No Testimonials Yet</h3>
+          <p style="color: var(--gray);">Be the first to share your experience with us!</p>
+        </div>
+      <?php else: ?>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+          <?php foreach ($testimonials as $testimonial): 
+            $date = new DateTime($testimonial['created_at']);
+            $initials = '';
+            $nameParts = explode(' ', $testimonial['author_name']);
+            foreach ($nameParts as $part) {
+              if (!empty($part)) {
+                $initials .= strtoupper(substr($part, 0, 1));
               }
-            ?>
+            }
+            $initials = substr($initials, 0, 2);
+          ?>
+          <div style="background: #fff; border: 1px solid var(--border-gray); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow-md); transition: all 0.3s;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+              <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">
+                <?= $initials ?>
+              </div>
+              <div>
+                <h4 style="font-weight: 700; color: var(--dark); margin: 0; font-size: 1.05rem;"><?= htmlspecialchars($testimonial['author_name']) ?></h4>
+                <p style="color: var(--primary); font-size: 0.8rem; margin: 0.3rem 0 0; font-weight: 600;"><?= $date->format('M j, Y') ?></p>
+              </div>
+            </div>
+            <p style="color: var(--gray); line-height: 1.7; margin: 0;">
+              "<?= htmlspecialchars(substr($testimonial['content'], 0, 150)) ?><?= strlen($testimonial['content']) > 150 ? '...' : '' ?>"
+            </p>
           </div>
+          <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-
-    <!-- ── COMMENT FORM ─────────────────────────── -->
-    <div class="comment-form-section">
-      <h2 class="form-title">Leave a Reply</h2>
-
-      <?php if ($success): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
       <?php endif; ?>
-
-      <?php if ($error): ?>
-        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
-      <?php endif; ?>
-
-      <form method="POST" action="">
-        <div class="form-group">
-          <label for="comment">Comment</label>
-          <textarea 
-            name="comment" 
-            id="comment" 
-            class="form-control" 
-            placeholder="Share your experience with us..."
-            required><?= isset($_POST['comment']) ? htmlspecialchars($_POST['comment']) : '' ?></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input 
-              type="text" 
-              name="name" 
-              id="name" 
-              class="form-control" 
-              placeholder="Your full name"
-              value="<?= isset($_POST['name']) ? htmlspecialchars($_POST['name']) : '' ?>"
-              required>
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input 
-              type="email" 
-              name="email" 
-              id="email" 
-              class="form-control" 
-              placeholder="your.email@example.com"
-              value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
-              required>
-          </div>
-        </div>
-
-        <button type="submit" name="submit_testimonial" class="submit-btn">Submit Now</button>
-      </form>
     </div>
+  </section>
 
-  </div>
-</section>
+  <!-- FORM SECTION -->
+  <section class="section section-bg">
+    <div style="max-width: 900px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="section-subtitle">SHARE YOUR STORY</div>
+        <h2 class="section-title">Leave Your Testimonial</h2>
+        <p style="color: var(--gray); font-size: 1rem; margin-top: 1rem;">
+          Your story matters. Help inspire others by sharing how we've made a difference in your life.
+        </p>
+      </div>
+
+      <div style="background: #fff; border-radius: 12px; padding: 2.5rem; box-shadow: var(--shadow-md);">
+        <?php if ($success): ?>
+          <div style="background: var(--secondary-light); border: 1px solid var(--secondary); border-left: 4px solid var(--secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: var(--secondary); font-weight: 600;">
+            ✓ <?= htmlspecialchars($success) ?>
+          </div>
+        <?php endif; ?>
+
+        <?php if ($error): ?>
+          <div style="background: var(--primary-light); border: 1px solid var(--primary); border-left: 4px solid var(--primary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: var(--primary); font-weight: 600;">
+            ✕ <?= htmlspecialchars($error) ?>
+          </div>
+        <?php endif; ?>
+
+        <form method="POST" action="">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Your Name *</label>
+            <input type="text" name="name" required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem;" value="<?= isset($_POST['name']) ? htmlspecialchars($_POST['name']) : '' ?>" placeholder="Full Name">
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Email Address *</label>
+            <input type="email" name="email" required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem;" value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>" placeholder="your.email@example.com">
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Your Testimonial *</label>
+            <textarea name="comment" required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem; min-height: 150px; resize: vertical;" placeholder="Share your experience and how we've made a difference in your life..."><?= isset($_POST['comment']) ? htmlspecialchars($_POST['comment']) : '' ?></textarea>
+            <p style="color: var(--gray); font-size: 0.8rem; margin: 0.5rem 0 0;">Minimum 10 characters</p>
+          </div>
+
+          <button type="submit" name="submit_testimonial" class="btn btn-primary" style="width: 100%;">Submit Testimonial →</button>
+          <p style="color: var(--gray); font-size: 0.8rem; margin: 1rem 0 0; text-align: center;">Your testimonial will appear after moderation by our team.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPACT SECTION -->
+  <section class="section">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <h2 class="section-title" style="margin-bottom: 2rem;">Real Impact, Real Stories</h2>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+        <div style="background: var(--primary-light); padding: 2rem; border-radius: 12px; border-top: 4px solid var(--primary);">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎓</div>
+          <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Education Success</h4>
+          <p style="color: var(--gray); margin: 0;">Students getting scholarships and achieving academic excellence</p>
+        </div>
+
+        <div style="background: var(--secondary-light); padding: 2rem; border-radius: 12px; border-top: 4px solid var(--secondary);">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">💼</div>
+          <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Job Placement</h4>
+          <p style="color: var(--gray); margin: 0;">ICT graduates finding employment and building careers</p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #FEF3DC 0%, #FFF0E6 100%); padding: 2rem; border-radius: 12px; border-top: 4px solid #F5A623;">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏥</div>
+          <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Health Improved</h4>
+          <p style="color: var(--gray); margin: 0;">Communities accessing quality healthcare for the first time</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </main>
 
 <?php include './includes/footer.php'; ?>
+</body>
+</html>

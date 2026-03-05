@@ -2,406 +2,168 @@
 require_once './includes/config.php';
 require_once './includes/db.php';
 include './includes/header.php';
-
-// Handle form submission
-$success = '';
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $subject = trim($_POST['subject'] ?? '');
-    $message = trim($_POST['message'] ?? '');
-    
-    if (empty($name) || empty($email) || empty($subject) || empty($message)) {
-        $error = 'All fields are required.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Please enter a valid email address.';
-    } else {
-        try {
-            // Store contact message in comments table (or you could create a separate contacts table)
-            $stmt = $pdo->prepare(
-                "INSERT INTO comments (post_id, author_name, author_email, author_ip, content, status, created_at)
-                 VALUES (-1, :name, :email, :ip, :message, 'pending', NOW())"
-            );
-            
-            $messageContent = "Subject: " . $subject . "\n\n" . $message;
-            
-            $stmt->execute([
-                ':name' => $name,
-                ':email' => $email,
-                ':ip' => $_SERVER['REMOTE_ADDR'] ?? '',
-                ':message' => $messageContent
-            ]);
-            
-            // Optionally send email notification to admin
-            // mail('inquiry@whobaogofoundation.org', 'Contact Form: ' . $subject, $messageContent, 'From: ' . $email);
-            
-            $success = 'Thank you for contacting us! We will get back to you soon.';
-            
-            // Clear form
-            $_POST = [];
-        } catch (PDOException $e) {
-            $error = 'Something went wrong. Please try again later.';
-            error_log('Contact form error: ' . $e->getMessage());
-        }
-    }
-}
 ?>
-
-<style>
-          /* ── PAGE HERO BANNER ──────────────────────────── */
-  .page-hero {
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                url('/assets/images/about-hero-bg.jpg') center/cover;
-    min-height: 320px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 2rem;
-    position: relative;
-  }
-  .page-hero-content h1 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 900;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-  }
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: rgba(224,53,53,0.9);
-    padding: 0.8rem 1.5rem;
-    border-radius: 100px;
-  }
-  .breadcrumb a,
-  .breadcrumb span {
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  .breadcrumb a:hover { opacity: 0.8; }
-  .breadcrumb span { opacity: 0.7; }
-
-  /* ── CONTACT PAGE ──────────────────────────────── */
-  .contact-container {
-    padding: 4rem 0;
-  }
-  
-  .contact-header {
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-  .contact-header-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--ink-light);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.8rem;
-  }
-  .contact-header h1 {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 900;
-    color: var(--ink);
-    text-transform: uppercase;
-  }
-
-  /* ── CONTACT INFO CARDS ────────────────────────── */
-  .contact-info-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    margin-bottom: 4rem;
-  }
-  .contact-info-card {
-    background: var(--surface);
-    border-radius: var(--r-lg);
-    padding: 2.5rem 2rem;
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .contact-info-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  }
-  
-  .contact-icon {
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 1.5rem;
-    border-radius: 50%;
-    background: var(--red);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: #fff;
-  }
-  .contact-info-card:nth-child(2) .contact-icon {
-    background: var(--red);
-  }
-  .contact-info-card:nth-child(3) .contact-icon {
-    background: var(--red);
-  }
-  
-  .contact-info-card h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 1.1rem;
-    font-weight: 900;
-    color: var(--ink);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  .contact-info-card p {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: var(--ink-mid);
-    margin-bottom: 0.5rem;
-  }
-  .contact-info-card a {
-    color: var(--ink-mid);
-    transition: color 0.2s;
-  }
-  .contact-info-card a:hover {
-    color: var(--red);
-  }
-
-  /* ── CONTACT FORM ──────────────────────────────── */
-  .contact-form-section {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  .form-container {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--r-lg);
-    padding: 3rem;
-  }
-  
-  .alert {
-    padding: 1rem 1.2rem;
-    border-radius: var(--r-sm);
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-  }
-  .alert-success {
-    background: var(--teal-soft);
-    border: 1px solid var(--teal);
-    color: var(--teal-dark);
-  }
-  .alert-error {
-    background: var(--red-soft);
-    border: 1px solid var(--red);
-    color: var(--red-dark);
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  .form-group label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--ink-mid);
-    margin-bottom: 0.5rem;
-  }
-  .form-control {
-    width: 100%;
-    padding: 0.9rem 1.2rem;
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    font-size: 0.9rem;
-    font-family: inherit;
-    color: var(--ink);
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .form-control:focus {
-    outline: none;
-    border-color: var(--red);
-    box-shadow: 0 0 0 3px var(--red-soft);
-  }
-  textarea.form-control {
-    min-height: 150px;
-    resize: vertical;
-  }
-  
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-  
-  .submit-btn {
-    width: 100%;
-    background: var(--red);
-    color: #fff;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: var(--r-sm);
-    font-weight: 700;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .submit-btn:hover {
-    background: var(--red-dark);
-    transform: translateY(-2px);
-  }
-
-  /* ── RESPONSIVE ────────────────────────────────── */
-  @media (max-width: 1024px) {
-    .contact-info-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .contact-container {
-      padding: 2.5rem 0;
-    }
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-    .form-container {
-      padding: 2rem 1.5rem;
-    }
-  }
-</style>
 
 <main>
 
-<!-- ── PAGE HERO ───────────────────────────────── -->
-<section class="page-hero">
-  <div class="page-hero-content">
-    <h1>Contact Us</h1>
-  </div>
-  <div class="breadcrumb">
-    <a href="/">HOME</a>
-    <span>/</span>
-    <span>CONTACT US</span>
-  </div>
-</section>
-
-<!-- ── CONTACT CONTENT ────────────────────────────  -->
-<section class="contact-container">
-  <div class="wrap">
-    
-    <div class="contact-header">
-      <div class="contact-header-label">Get The Latest</div>
-      <h1>Get In Touch</h1>
+  <!-- ══════════════════════════════════════════════════════════════
+       PAGE HERO
+       ══════════════════════════════════════════════════════════════ -->
+  <section style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./assets/images/contact-bg.jpg') center/cover; min-height: 300px; display: flex; align-items: center; justify-content: space-between; padding: 3rem 2rem; position: relative;">
+    <div>
+      <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Contact Us</h1>
     </div>
-
-    <!-- Contact Info Cards -->
-    <div class="contact-info-grid">
-      
-      <!-- Address Card -->
-      <div class="contact-info-card">
-        <div class="contact-icon">🏠</div>
-        <h3>Address:</h3>
-        <p>No. 1 Tafawa Balewa Crescent,</p>
-        <p>Off Adeniran Ogunsanya street,</p>
-        <p>Surulere, Lagos.</p>
-      </div>
-
-      <!-- Email Card -->
-      <div class="contact-info-card">
-        <div class="contact-icon">✉</div>
-        <h3>Email Address:</h3>
-        <p><a href="mailto:info@whobaogofoundation.org">info@whobaogofoundation.org</a></p>
-        <p><a href="mailto:inquiry@whobaogofoundation.org">inquiry@whobaogofoundation.org</a></p>
-      </div>
-
-      <!-- Phone Card -->
-      <div class="contact-info-card">
-        <div class="contact-icon">📞</div>
-        <h3>Phone No:</h3>
-        <p><a href="tel:+2348180452165">(+234) 818 045 2165</a></p>
-        <p><a href="tel:014538555">01-453 8555</a></p>
-      </div>
-
+    <div style="background: var(--primary); padding: 0.8rem 1.5rem; border-radius: 100px; color: #fff; font-weight: 600; font-size: 0.9rem;">
+      <a href="index.php" style="color: #fff; text-decoration: none;">HOME</a>
+      <span style="margin: 0 0.8rem;"> / </span>
+      <span>CONTACT US</span>
     </div>
+  </section>
 
-    <!-- Contact Form -->
-    <div class="contact-form-section">
-      <div class="form-container">
-        
-        <?php if ($success): ?>
-          <div class="alert alert-success">✓ <?= htmlspecialchars($success) ?></div>
-        <?php endif; ?>
+  <!-- ══════════════════════════════════════════════════════════════
+       CONTACT SECTION
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <div class="section-subtitle">GET IN TOUCH</div>
+        <h2 class="section-title">We'd Love to Hear From You</h2>
+        <p style="color: var(--gray); font-size: 1.05rem; margin-top: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+          Have questions about our programs or want to get involved? Reach out to us using any of the methods below.
+        </p>
+      </div>
 
-        <?php if ($error): ?>
-          <div class="alert alert-error">✗ <?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+        <!-- Contact Info -->
+        <div>
+          <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-bottom: 2rem;">Contact Information</h3>
 
-        <form method="POST" action="">
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="name">Your Name *</label>
-              <input 
-                type="text" 
-                name="name" 
-                id="name" 
-                class="form-control" 
-                placeholder="John Doe"
-                value="<?= isset($_POST['name']) ? htmlspecialchars($_POST['name']) : '' ?>"
-                required>
+          <div style="display: grid; gap: 2rem;">
+            <!-- Address -->
+            <div>
+              <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                <span style="font-size: 1.5rem;">📍</span>
+                Location
+              </h4>
+              <p style="color: var(--gray); line-height: 1.7;">
+                No. 1 Tafawa Balewa Crescent<br>
+                Surulere, Lagos<br>
+                Nigeria
+              </p>
             </div>
 
-            <div class="form-group">
-              <label for="email">Your Email *</label>
-              <input 
-                type="email" 
-                name="email" 
-                id="email" 
-                class="form-control" 
-                placeholder="john@example.com"
-                value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
-                required>
+            <!-- Email -->
+            <div>
+              <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                <span style="font-size: 1.5rem;">✉</span>
+                Email
+              </h4>
+              <p style="color: var(--gray);">
+                <a href="mailto:inquiry@whobaogofoundation.org" style="color: var(--primary); text-decoration: none; font-weight: 600;">inquiry@whobaogofoundation.org</a>
+              </p>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                <span style="font-size: 1.5rem;">📞</span>
+                Phone
+              </h4>
+              <p style="color: var(--gray);">
+                <a href="tel:08180452165" style="color: var(--primary); text-decoration: none; font-weight: 600;">08180452165</a>
+              </p>
+            </div>
+
+            <!-- Hours -->
+            <div>
+              <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                <span style="font-size: 1.5rem;">🕐</span>
+                Office Hours
+              </h4>
+              <p style="color: var(--gray); line-height: 1.7;">
+                Monday - Friday: 9:00 AM - 5:00 PM<br>
+                Saturday: 10:00 AM - 2:00 PM<br>
+                Sunday: Closed
+              </p>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="subject">Subject *</label>
-            <input 
-              type="text" 
-              name="subject" 
-              id="subject" 
-              class="form-control" 
-              placeholder="How can we help you?"
-              value="<?= isset($_POST['subject']) ? htmlspecialchars($_POST['subject']) : '' ?>"
-              required>
+          <!-- Social Links -->
+          <div style="margin-top: 2.5rem;">
+            <h4 style="font-weight: 700; color: var(--dark); margin-bottom: 1rem;">Follow Us</h4>
+            <div style="display: flex; gap: 1rem;">
+              <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; font-weight: 700; transition: all 0.3s;">f</a>
+              <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; font-weight: 700; transition: all 0.3s;">𝕏</a>
+              <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; font-weight: 700; transition: all 0.3s;">in</a>
+            </div>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label for="message">Your Message *</label>
-            <textarea 
-              name="message" 
-              id="message" 
-              class="form-control" 
-              placeholder="Write your message here..."
-              required><?= isset($_POST['message']) ? htmlspecialchars($_POST['message']) : '' ?></textarea>
-          </div>
+        <!-- Contact Form -->
+        <div style="background: var(--light-gray); padding: 2rem; border-radius: 12px;">
+          <form onsubmit="handleSubmit(event)">
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Your Name</label>
+              <input type="text" required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
+            </div>
 
-          <button type="submit" name="submit_contact" class="submit-btn">Send Message</button>
-        </form>
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Email Address</label>
+              <input type="email" required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
+            </div>
 
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Phone Number</label>
+              <input type="tel" style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Subject</label>
+              <input type="text" required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;">Message</label>
+              <textarea required style="width: 100%; padding: 0.9rem; border: 1px solid var(--border-gray); border-radius: 8px; font-family: inherit; font-size: 0.95rem; min-height: 120px; resize: vertical;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message →</button>
+          </form>
+        </div>
       </div>
     </div>
+  </section>
 
-  </div>
-</section>
+  <!-- ══════════════════════════════════════════════════════════════
+       MAP SECTION (Placeholder)
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="section section-bg">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;">Find Us on the Map</h2>
+      <div style="border-radius: 12px; overflow: hidden; height: 400px; background: var(--light-gray); display: flex; align-items: center; justify-content: center; color: var(--gray);">
+        <!-- Google Maps embed or placeholder -->
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.4076435231765!2d3.3522847!3d6.490831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1sTafawa Balewa Crescent, Surulere, Lagos!2s!5e0!3m2!1sen!2sng!4v1234567890" 
+          width="100%" 
+          height="100%" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </section>
 
 </main>
 
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+    alert('Thank you for reaching out! We will respond to your message shortly.');
+    e.target.reset();
+  }
+</script>
+
 <?php include './includes/footer.php'; ?>
+</body>
+</html>
