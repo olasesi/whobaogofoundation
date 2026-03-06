@@ -42,9 +42,38 @@ $posts = $newsStmt->fetchAll();
 
     <div class="hero-image">
       <div class="hero-image-container">
-        <img src="./assets/images/girls-education.jpg" alt="Girls Education Program">
+
+        <!-- SLIDER (images only) -->
+        <div class="hero-slider">
+          <div class="hero-slide active">
+            <img src="./assets/images/girls-education.jpg" alt="Girls Education Program">
+          </div>
+          <div class="hero-slide">
+            <img src="./assets/images/IMG-20191217-WA0019-1024x768.jpg" alt="We Serve Humanity">
+          </div>
+          <div class="hero-slide">
+            <img src="./assets/images/image3.jpg" alt="Health Outreach">
+          </div>
+          <div class="hero-slide">
+            <img src="./assets/images/cohort-3-training.jpg" alt="Community Support">
+          </div>
+        </div>
+
         <div class="image-overlay"></div>
-        
+
+        <!-- Prev / Next arrows — direct children of container so position:absolute
+             is always relative to .hero-image-container, never to .hero-slider -->
+        <button class="hero-slider-btn hero-slider-prev" onclick="heroSliderPrev()" aria-label="Previous">‹</button>
+        <button class="hero-slider-btn hero-slider-next" onclick="heroSliderNext()" aria-label="Next">›</button>
+
+        <!-- Dots — same reason, direct child -->
+        <div class="hero-slider-dots">
+          <button class="hero-slider-dot active" onclick="heroSliderGoTo(0)" aria-label="Slide 1"></button>
+          <button class="hero-slider-dot" onclick="heroSliderGoTo(1)" aria-label="Slide 2"></button>
+          <button class="hero-slider-dot" onclick="heroSliderGoTo(2)" aria-label="Slide 3"></button>
+          <button class="hero-slider-dot" onclick="heroSliderGoTo(3)" aria-label="Slide 4"></button>
+        </div>
+
         <div class="stats-float left">
           <div class="stat-item">
             <div class="stat-icon">💻</div>
@@ -60,6 +89,7 @@ $posts = $newsStmt->fetchAll();
             <div class="stat-label">Programs Active</div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -326,10 +356,170 @@ $posts = $newsStmt->fetchAll();
 </main>
 
 <style>
-  /* Carousel Styles for About Section */
-  .carousel-about {
-    position: relative;
+  /* ── HERO SLIDER ─────────────────────────────────────────────────── */
+
+  /*
+   * KEY FIX: .hero-image-container is the single positioned ancestor.
+   * .hero-slider, .image-overlay, .stats-float, .hero-slider-btn, and
+   * .hero-slider-dots are ALL direct children — so position:absolute on
+   * each is always relative to the same parent, on every viewport.
+   */
+  .hero-image-container {
+    position: relative !important;  /* force on every viewport */
+    overflow: hidden;
   }
+
+  /* ── Slides ── */
+  .hero-slider {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+
+  .hero-slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    transition: opacity 0.75s ease-in-out;
+    pointer-events: none;
+  }
+
+  .hero-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .hero-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ── Overlay (above slides, below controls) ── */
+  .hero-image-container > .image-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* ── Stats floats (above overlay) ── */
+  .hero-image-container > .stats-float {
+    position: absolute;
+    z-index: 4;
+  }
+
+  /* ── Prev / Next arrows (above everything) ── */
+  .hero-slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;                   /* above overlay + stats */
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.52);
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    /* keep button inside rounded container */
+    pointer-events: auto;
+  }
+
+  .hero-slider-btn:hover,
+  .hero-slider-btn:focus-visible {
+    background: var(--primary);
+    border-color: var(--primary);
+    outline: none;
+  }
+
+  .hero-slider-prev { left: 0.85rem; }
+  .hero-slider-next { right: 0.85rem; }
+
+  /* ── Dots bar ── */
+  .hero-slider-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 0.8rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 100px;
+    /* Prevent the bar itself from shrinking on narrow screens */
+    white-space: nowrap;
+  }
+
+  .hero-slider-dot {
+    position: relative;      /* for ::after tap target */
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    border: 2px solid rgba(255, 255, 255, 0.65);
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, border-color 0.2s;
+  }
+
+  /* Invisible extra tap area (important for mobile) */
+  .hero-slider-dot::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+  }
+
+  .hero-slider-dot.active {
+    background: #fff;
+    border-color: #fff;
+    transform: scale(1.4);
+  }
+
+  /* ── Responsive aspect ratios ── */
+  /* Desktop: keep the 4/5 set by modern-corporate.css */
+
+  @media (max-width: 1024px) {
+    /* Single-column layout — wider, less tall */
+    .hero-image-container { aspect-ratio: 4 / 3; }
+    .hero-slider-btn { width: 40px; height: 40px; font-size: 1.4rem; }
+  }
+
+  @media (max-width: 768px) {
+    .hero-image-container { aspect-ratio: 16 / 9; }
+    .hero-slider-btn { width: 34px; height: 34px; font-size: 1.2rem; }
+    .hero-slider-prev { left: 0.5rem; }
+    .hero-slider-next { right: 0.5rem; }
+    .hero-slider-dots { bottom: 0.6rem; gap: 0.4rem; padding: 0.35rem 0.6rem; }
+    .hero-slider-dot  { width: 8px; height: 8px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-image-container { aspect-ratio: 4 / 3; }
+    .hero-slider-btn { width: 30px; height: 30px; font-size: 1rem; border-width: 1.5px; }
+    .hero-slider-prev { left: 0.4rem; }
+    .hero-slider-next { right: 0.4rem; }
+    .hero-slider-dots { bottom: 0.5rem; gap: 0.35rem; padding: 0.3rem 0.5rem; }
+    .hero-slider-dot  { width: 7px; height: 7px; }
+  }
+
+  /* ── ABOUT CAROUSEL ──────────────────────────────────────────────── */
+  .carousel-about { position: relative; }
 
   .carousel-container-about {
     position: relative;
@@ -346,116 +536,94 @@ $posts = $newsStmt->fetchAll();
     transition: opacity 0.6s ease-in-out;
   }
 
-  .carousel-slide-about.active {
-    opacity: 1;
-  }
+  .carousel-slide-about.active { opacity: 1; }
 
   .carousel-slide-about img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
   }
 
   .carousel-dots-about {
     position: absolute;
-    bottom: 1.5rem;
-    left: 50%;
+    bottom: 1.5rem; left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    gap: 0.8rem;
-    z-index: 10;
+    display: flex; gap: 0.8rem; z-index: 10;
   }
 
   .dot-about {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: all 0.3s;
-    border: none;
-    padding: 0;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer; transition: all 0.3s;
+    border: none; padding: 0;
   }
 
-  .dot-about.active {
-    background: #fff;
-    transform: scale(1.2);
-  }
+  .dot-about.active { background: #fff; transform: scale(1.2); }
 
   .carousel-btn {
-    position: absolute;
-    top: 50%;
+    position: absolute; top: 50%;
     transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s;
-    z-index: 10;
+    width: 48px; height: 48px;
+    background: rgba(0,0,0,0.5);
+    border: none; color: #fff; font-size: 24px;
+    cursor: pointer; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.3s; z-index: 10;
   }
 
-  .carousel-btn:hover {
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  .prev-about {
-    left: 1rem;
-  }
-
-  .next-about {
-    right: 1rem;
-  }
+  .carousel-btn:hover { background: rgba(0,0,0,0.8); }
+  .prev-about { left: 1rem; }
+  .next-about { right: 1rem; }
 
   @media (max-width: 768px) {
     .carousel-container-about {
-      order: -1;
-      max-width: 400px;
-      margin: 0 auto;
-      width: 100%;
+      order: -1; max-width: 400px; margin: 0 auto; width: 100%;
     }
+    .hero-slider-btn { width: 34px; height: 34px; font-size: 1.1rem; }
   }
 </style>
 
 <script>
+  /* ── HERO SLIDER ───────────────────────────────── */
+  let heroIndex = 0;
+  const heroSlides = document.querySelectorAll('.hero-slide');
+  const heroDots   = document.querySelectorAll('.hero-slider-dot');
+
+  function heroSliderGoTo(n) {
+    heroSlides[heroIndex].classList.remove('active');
+    heroDots[heroIndex].classList.remove('active');
+    heroIndex = (n + heroSlides.length) % heroSlides.length;
+    heroSlides[heroIndex].classList.add('active');
+    heroDots[heroIndex].classList.add('active');
+  }
+
+  function heroSliderNext() { heroSliderGoTo(heroIndex + 1); }
+  function heroSliderPrev() { heroSliderGoTo(heroIndex - 1); }
+
+  // Auto-advance every 5 seconds
+  let heroTimer = setInterval(heroSliderNext, 5000);
+
+  // Pause on hover
+  const heroContainer = document.querySelector('.hero-image-container');
+  heroContainer.addEventListener('mouseenter', () => clearInterval(heroTimer));
+  heroContainer.addEventListener('mouseleave', () => { heroTimer = setInterval(heroSliderNext, 5000); });
+
+  /* ── ABOUT CAROUSEL ────────────────────────────── */
   let aboutCarouselIndex = 0;
   const aboutSlides = document.querySelectorAll('.carousel-slide-about');
-  const aboutDots = document.querySelectorAll('.dot-about');
+  const aboutDots   = document.querySelectorAll('.dot-about');
 
-  function carouselGoTo(n) {
-    aboutCarouselIndex = n;
-    updateCarousel();
-  }
-
-  function carouselNext() {
-    aboutCarouselIndex = (aboutCarouselIndex + 1) % aboutSlides.length;
-    updateCarousel();
-  }
-
-  function carouselPrev() {
-    aboutCarouselIndex = (aboutCarouselIndex - 1 + aboutSlides.length) % aboutSlides.length;
-    updateCarousel();
-  }
+  function carouselGoTo(n) { aboutCarouselIndex = n; updateCarousel(); }
+  function carouselNext()  { aboutCarouselIndex = (aboutCarouselIndex + 1) % aboutSlides.length; updateCarousel(); }
+  function carouselPrev()  { aboutCarouselIndex = (aboutCarouselIndex - 1 + aboutSlides.length) % aboutSlides.length; updateCarousel(); }
 
   function updateCarousel() {
-    aboutSlides.forEach(slide => slide.classList.remove('active'));
-    aboutDots.forEach(dot => dot.classList.remove('active'));
-    
+    aboutSlides.forEach(s => s.classList.remove('active'));
+    aboutDots.forEach(d => d.classList.remove('active'));
     aboutSlides[aboutCarouselIndex].classList.add('active');
     aboutDots[aboutCarouselIndex].classList.add('active');
   }
 
-  // Auto-advance carousel every 5 seconds
   setInterval(carouselNext, 5000);
-
-  // Initialize
   updateCarousel();
 </script>
 
