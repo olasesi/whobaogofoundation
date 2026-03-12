@@ -8,7 +8,7 @@
  * 4. DELETE this file immediately
  */
 
-$password = '123456';  // <-- change this to whatever password you want
+$password = 'P@$sword1';  // <-- change this to whatever password you want
 $hash     = password_hash($password, PASSWORD_BCRYPT);
 ?>
 <!DOCTYPE html>

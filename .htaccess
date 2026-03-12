@@ -1,25 +1,80 @@
 # Whoba Ogo Foundation - URL Rewriting Rules
-# This file handles clean URLs for blog posts and other dynamic content
-# FIXED: Set RewriteBase to /whobaogofoundation/ for subdirectory installation
+# ══════════════════════════════════════════════════════════════════
 
+# Disable directory listing everywhere
+Options -Indexes
+
+# ══════════════════════════════════════════════════════════════════
+#  BLOCK ACCESS TO INCLUDES FOLDERS
+#  Covers both /includes/ (root) and /admin/includes/ (admin)
+#  This must come BEFORE the rewrite engine rules
+# ══════════════════════════════════════════════════════════════════
+<IfModule mod_authz_core.c>
+    # Apache 2.4+
+    <DirectoryMatch "includes">
+        Require all denied
+    </DirectoryMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    # Apache 2.2 fallback
+    <DirectoryMatch "includes">
+        Order Allow,Deny
+        Deny from all
+    </DirectoryMatch>
+</IfModule>
+
+# Belt-and-suspenders: also block via rewrite so even a direct
+# file request like /includes/config.php returns 403
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /whobaogofoundation/
 
-    # Prevent rewriting of actual files and directories
+    # ── Block root includes folder ───────────────────────────────
+    RewriteRule ^includes(/.*)?$ - [F,L]
+
+    # ── Block admin includes folder ──────────────────────────────
+    RewriteRule ^admin/includes(/.*)?$ - [F,L]
+
+    # ── Prevent rewriting of actual files and directories ────────
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
-    # Route blog posts: /{slug} → /blog-post.php?slug={slug}
+    # ── Route blog posts: /{slug} → blog-post.php?slug={slug} ────
     RewriteRule ^([a-z0-9-]+)/?$ blog-post.php?slug=$1 [QSA,L]
 
-    # Route single program pages: /programs/{slug} → /program-detail.php?slug={slug}
+    # ── Route program pages ──────────────────────────────────────
     RewriteRule ^programs/([a-z0-9-]+)/?$ program-detail.php?slug=$1 [QSA,L]
 
-    # Route single gallery pages: /gallery/([a-z0-9-]+)/?$ → /gallery-detail.php?slug=$1
+    # ── Route gallery pages ──────────────────────────────────────
     RewriteRule ^gallery/([a-z0-9-]+)/?$ gallery-detail.php?slug=$1 [QSA,L]
 
-    # Remove trailing slashes (optional)
+    # ── Remove trailing slashes ──────────────────────────────────
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.+)/$ $1 [R=301,L]
+
+</IfModule>
+
+# ══════════════════════════════════════════════════════════════════
+#  BLOCK ACCESS TO SENSITIVE FILES
+#  No one should ever reach .env, config, sql dumps, logs, etc.
+# ══════════════════════════════════════════════════════════════════
+<FilesMatch "\.(env|log|sql|sh|bak|htpasswd|ini)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ══════════════════════════════════════════════════════════════════
+#  SECURITY HEADERS
+# ══════════════════════════════════════════════════════════════════
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header unset X-Powered-By
 </IfModule>
